@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<!-- Bootstrap CSS  -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+		<link rel="stylesheet" href="bar.css">
+		
+		<title>Course 02806</title>
+
+	</head>
+	
+	<body align="middle">
+
+		<h2>02806 - Week 2</h2>
+
+		<h3>Presidents</h3>
+
+		<div id="presidentsDiv" style="border: 1px solid black; width: 502px; height: 202px; margin: auto">
+			<!-- Content will be put here by script.js -->
+		</div>
+
+		<div id="buttonDiv" style="width: 150px; height: auto; margin: auto; margin-top: 60px">
+			<button onclick="drawPresidentsPlotRandom()" class="btn btn-danger btn-block">Random</button>
+			<button onclick="drawPresidentsPlotCSV()" class="btn btn-danger btn-block">From CSV</button>
+			
+		</div>
+
+		<h3>Barchart</h3>
+
+		<div id="barChartDiv" style="border: 1px solid black; width: 502px; height: 202px; margin: auto">
+			<!-- Content will be put here by script.js -->
+		</div>
+
+		<div id="buttonDiv" style="width: 150px; height: auto; margin: auto; margin-top: 30px">
+			<button onclick="drawChart()" class="btn btn-danger btn-block">Random</button>
+			<button onclick="drawChartCSV()" class="btn btn-danger btn-block">From CSV</button>
+		</div>
+
+		<h3>Scatter Plot</h3>
+
+		<div id="scatterPlotDiv" style="border: 1px solid black; width: 502px; height: 202px; margin: auto">
+			<!-- Content will be put here by script.js -->
+		</div>
+
+		<div id="buttonDiv" style="width: 150px; height: auto; margin: auto; margin-top: 30px">
+			<button onclick="drawScatterPlot()" class="btn btn-danger btn-block">Random</button>
+			<button onclick="drawScatterPlotCSV()" class="btn btn-danger btn-block">From CSV</button>
+		</div>
+
+
+
+
+		<!-- JavaScript -->
+
+		<!-- d3.js -->
+		<script src="https://d3js.org/d3.v3.js"></script>
+
+		<!-- Custom Javascript -->
+		<script src="js/script.js"></script>
+
+
+	</body>
+</html>
+
+

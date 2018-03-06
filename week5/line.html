@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+
+		<!-- Bootstrap CSS  -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<!-- <link rel="stylesheet" src="css/tooltip.css"> -->
+
+		<style> /* set the CSS */
+		.line {
+			fill: none;
+			stroke: steelblue;
+			stroke-width: 1px;
+		}
+		.dangerLine {
+			fill: none;
+			stroke: red;
+			stroke-width: 1px;
+		}
+		.safeLevel {
+			stroke: red;
+			stroke-dasharray: 2, 3;
+		}
+		.dangerLabel {
+			fill: red;
+			font-size: 12px
+		}
+		</style>
+
+		<title>Course 02806</title>
+
+	</head>
+
+	<body>
+
+    <div style="width: 800px; margin:auto; margin-top: 40px">
+
+      <div id="chart" style="border: 1px solid" onclick="updateChart()" align="center">
+				<!-- <div id="tooltip" class="hidden">
+					<strong><p><span id="month"/></strong></p>
+						<p>Types: <span id="count"/></p>
+				</div> -->
+			</div>
+
+    </div>
+		<!-- JavaScript -->
+
+		<!-- d3.js -->
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+
+		<!-- Custom Javascript -->
+		<script src="js/line.js"></script>
+
+
+
+	</body>
+</html>

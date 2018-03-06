@@ -1,0 +1,22 @@
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 40px;
+  padding: 2px;
+  font: 14px sans-serif;
+  color: white;
+  background: grey;
+  border: 2px;
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+div.arrow-down {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 20px solid grey;
+}
