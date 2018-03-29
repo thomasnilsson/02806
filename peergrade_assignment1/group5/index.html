@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">    
+    <head>        
+        <meta charset="utf-8">        
+        <title>Assignment 1</title>        
+        <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>    
+        <link rel="stylesheet" href="style.css">
+    </head>    
+    <body>     
+    
+    <div class="sidenav">
+    <div id="headernav">
+        <h3>02806</h3>
+        <h3>Assignment 1</h3>
+    </div>
+    <div id="navdivision">MAIN NAVIGATION</div>
+    <div class="navelem"><a href="#part1">Part 1</a></div>
+    <div class="navelem"><a href="#part2">Part 2</a></div>
+    <div class="navelem"><a href="#part3">Part 3</a></div>
+    <div class="navelem"><a href="#part4">Part 4</a></div>
+    </div>
+
+    <div id="content">
+        <div id="part1">
+            <h2>Part 1: DAOST Chapter 2 Questions</h2>
+            <ul class="bullet">
+                <li>Explain in your own words the point of the jitter plot.</li>
+                <p>Jitter plot is a type of a dot plot (in which we simply plot the data elements on a single line) where plotted elements are shifted from their original position by a small random amount in order to achieve a better visual representation of a dataset containing many of the same values. Thus it can be useful in case we have a dataset of integer values that can be potentially repeated.</p>
+                <li>Explain in your own words the point of figure 2-3. (I'm going to skip saying "in your own words" going forward, but I hope you get the point; I expect all answers to be in your own words).</li>
+                <p>Figure 2.3 is a great demonstration of the influence of the alignment of the bins parameter in a histogram, which refers to the way we place the bins - for instance centering them on the ticks or making the edges coincide with them. Essentially, it tells us that we must not overlook this parameter as it may influence the way our data looks in an unexpected way.</p>
+                <li>The author of DAOST (Philipp Janert) likes KDEs (and think they're better than histograms). And I don't. I didn't give a detailed explanation in the video, but now that works to my advantage. I'll ask you guys to think about this and thereby create an excellent exercise: When can KDEs be misleading?</li>
+                <p>KDEs vary depending on the chosen bandwidth size by changing which we, in essence, trade variance for bias. This may not seem like an issue if the element density is roughly the same across the dataset, but for datasets whose element density differs significantly, appropriate bandwidths can be different for high and low-density parts. If we try to rectify this flaw by introducing adaptive bandwidth we might encounter increased bias where data is missing. Finally, we might prefer to use histograms over KDEs when the dataset is smaller in order to avoid bias introduced by increased smoothing, as they can give us a more accurate indicator of where exactly data elements are.</p>
+                <li>I've discussed some strengths of the CDF - there are also weaknesses. Janert writes "[CDFs] have less intuitive appeal than histograms of KDEs". What does he mean by that?</li>
+                <p>He means that at a first glance it might not be as easy to grasp a CDF plot as the plots discussed before (such as histograms, dot/jitter plots or KDEs). This is because for those plots we can clearly see which values happen more often (i.e. are more likely to appear), whether it be more points at these values in case of a dot plot, or whether the bars are higher in case of a histogram, and so on. Even though with a CDF we can obtain information that is harder to get from histograms or KDEs, such as a fraction of data located between certain points, it may be less clear right away which values occur more often by just looking at the CDF.</p>
+                <li>What is a Quantile plot? What is it good for.</li>
+                <p>A quantile plot is a plot of a CDF with <i>x</i> and <i>y</i> axes reversed. It is good for figuring out which data corresponds to which percentile of the dataset (for instance, if we want to find out what percentile does a response time of 1000 ms correspond to - easy to see it is 66%, i.e. about 66% of requests are responded to in that time period).</p>
+                <li>How is a Probablity plot defined? What is it useful for? Have you ever seen one before?</li>
+                <p>A probability plot is a result of plotting data in such a way that allows us to find out whether a given data set is distributed according to some theoretical distribution. The way it is made is by trying to plot points in such a way that they form a straight line. As it is easy to detect deviation from that straight line, we can thus determine whether or not our assumption of underlying distribution holds. Also, mean and standard deviation estimations can be read off from this kind of plot.</p>
+                <li>One of the reasons I like DAOST is that Janert is so suspicious of mean, median, and related summary statistics. Explain why one has to be careful when using those - and why visualization of the full data is always better.</li>
+                <p> Media and standard deviation can only be reliable if we have a data set with a distribution that is symmetric and unimodal. The problem arises when we have data sets with other properties, for example, if the distribution is skewed then the mean does not provide a measure for the central tendency, or if it contains outliers, the standard deviation is increased (a value that is far removed from the mean is going to affect the results and therefore increase the standard deviation). Then, in these situations, other summary statistics like median and percentiles should be favored. This represents a problem because it means that these summary statistics can only be applied under specific assumptions, otherwise they can guide to misleading conclusions.</p>
+                <li>I love box plots. When are box plots most useful?</li>
+                <p>Box plots is a graphical method to display the data distribution through different measures (like median, the spread of the data and outliers). They are most useful for identifying outliers and for comparing distributions between one another, based on their location and width.</p>
+                <li>The book doesn't mention violin plots. Are those better or worse than box plots? Why?</li>
+                <p>Violin plots are a method to visualize the distribution of the data and its probability density (it is a combination of a box plot and a density plot). Because of this, violin plots display more information than box plots, they for example show if a distribution is multimodal. However they can be misleading when we have smaller sample of data.</p>
+            </ul>
+        </div>
+        
+        <div id="part2" style="margin-top:60px">
+            <h2>Part 2: DAOST Chapter 3 Questions</h2>
+            <ul class="bullet">
+                <li>Looking at Fig 3-1, Janert writes "the data itself shows clearly that the amount of random noise in the data is small". What do you think his argument is?</li>
+                <p>The graph shows that the data possess little variability. Noise in the data would indicate that the data swings wildly and that is unpredictably, contrary to what it is displayed on the graph. On the contrary it seems to be a strong relationship bettween the values.</p>
+                <li>Can you think of a real-world example of a multivariate relationship like the one in Fig 3-3 (lower right panel)?</li>
+                <p>One real-world example could be the oil production of two important oil exporters countries: Colombia and Venezuela. Before 2008 the percentage of the barrels produced per day maintained a stable number. However, as a consequence of the state-run oil corporation taking part on a strike, a large numbers of people were fired from their positions. This caused the oil production from Venezuela remained static, despite a big run-up in prices. On the other hand, Colombia was benefit by this and their production increased over the years. (The Economist, <a href="https://www.economist.com/news/americas/21607824-venezuelas-loss-thousands-oil-workers-has-been-other-countries-gain-brain-haemorrhage">Brain haemorrhage</a>, Jul 19th 2014)</p>
+                <li>What are the two methods Janert metions for smoothing noisy data? Can you think of other ones?</li>
+                <p>The methods that Janert mentions are Splines and LOESS. Smoothing splines incorporate a curve fitting technique, having an overall smoothness goal and LOESS are more responsive to local details in the data set, because  the fitting at point <i>x</i> is weighted toward the data nearest to <i>x</i>. <br>Another useful method for smoothing is <b>moving average</b>. The method starts with selecting of a subset with a specified length. From this subset, we calculate the mean and then move the subset by one point (observation) to the right. Then we calculate the mean from the new "moved" subset and continue until the last observation is reached. At the end we have a number of means that represent the approximation</p>
+                <li>What are residuals? Why is it a good idea to plot the residuals of your fit?</li>
+                <p>Numbers that represent the differences between a smoothing approximation and the actual data (by subtracting the smoothing approximation from the actual data) are called <b>residuals</b>. Plotting residuals can show if the chosen smoothing model is appropriate for the data. When there are residuals that acquire both positive and negative values, or residuals that follow some systematic trend, it is an indication of using an inappropriate model.</p>
+                <li>Explain in your own words the point of the smooth tube in figure 3-7.</li>
+                <p>The <b>smooth tube</b> indicates where the majority of data will appear. The upper line is constructed using a smooth curve for data that have residuals greater than zero; and the lower line is a smooth curve from data with negative residuals. Therefore, there will always be some data outside of the tube but the majority of data will be inside the tube.</p>
+                <li>What kind of relationships will a semi-log plot help you discover?</li>
+                <p><b>Semi-log plots</b> discover exponential relationships that would be hard to notice when plotted with the classic scale. In semi-log plots, the relationships can be easily discovered because of the logarithmic scale of the <i>y</i> axis so that the exponential data are plotted on a line.</p>
+                <li>What kind of functions will loglog plots help you see?</li>
+                <p><b>Loglog</b> plotting is useful for visualizing power law functions as power law relationships are displayed as a straight line. In loglog plots, both axis are scaled logarithmically.</p>
+                <li>What the h#ll is "banking" and what element from our visual system does it use to help us see patterns? What are potential problems with banking?</li>
+                <p><b>Banking</b> is a method that does not change the data but instead changes the aspect ratio of the whole plot. The aspect ratio is changed in the way that as much curves as possible have a 45 degree angle which represents the most convenient slope that allows us to see changes in data easily. One of the problems that can arise from banking is that the resulting graph can have a proportion that is hardly readable as people are used to proportions that are close to approximately 4 by 3.</p>
+                <li>I think figure 3-14 makes an important point about linear fits that is rarely made. What is it?</li>
+                <p>Linear fit does not necessarily represent the best fit of the data as for a two-dimensional dataset (where the two variables are asymmetric) the linear function can be constructed in two ways (depending on whether the first variable is considered as independent variable and the other one as dependent variable or vice versa).</p>
+                <li>Summarize the discussion of Graphical Analysis and Presentation Graphics on pp. 68-69 in your own words.</li>
+                <p><b>Graphical Analysis</b> and <b>Presentation Graphics</b> are two mutually different processes. When analyzing data, it is convenient to use many different visualization techniques as we are looking for a new (yet not discovered) patterns in the data. On the other hand, presentation graphics aim to share the results (that have been already discovered) with others. Therefore, we need to take a special care of the graphical format (axis labels, understandable data descriptions, ranges of plots, font style and size, and scalable output format) to communicate the results clearly.</p>
+            </ul>
+        </div>
+        
+        <div id="part3" style="margin-top:60px">
+            <h2>Part 3: Viz 1</h2>
+            <p><i>This is a reproduction of <a href="http://iquantny.tumblr.com/post/129373499164/this-is-quantifiably-the-best-month-to-go-to-the">http://iquantny.tumblr.com/post/129373499164/this-is-quantifiably-the-best-month-to-go-to-the</a></i></p>
+            <div id="linediv" class="centerdiv"></div>
+            <div id="article" class="centerdiv">
+            <h2>This is Quantifiably the Best Month to go to the Farmers Market</h2>
+            <p>As part of a homework assignment, I ask my students at Pratt to go out and chart something of interest to them, and Katherine Savarese came back with a simple chart about farmers markets that I loved- it inspired this post.</p>
+            <p>You probably know that farmers markets are a staple across all five boroughs of New York City, but September happens to be a very special month. Why is that?  Well, it turns out September is the month with the most unique types of fresh produce- forty three to be exact.</p>
+            <p>To show the current offerings, we charted how many types of fruits and vegetables are available by month, and showed if they were fresh or from storage.</p>
+            <div id = "graphics">
+                <div id="graphic" class="centergraphs">
+                </div>
+                <div id = "options" class="centergraphs">
+                <ul>
+                    <li id="ff"><span>Fresh fruit</span></li>
+                    <li id="fv"><span>Fresh vegetable</span></li>
+                    <li id="sf"><span>Storage fruit</span></li>
+                    <li id="sv"><span>Storage vegetable</span></li>
+                </ul>
+                </div>
+            </div>
+            <p>If you miss the month of September, you might be behind the fruit curve, but there are plenty more months of vegetables left.  The chart shows that fresh vegetables are available 9 out of 12 months, but fruit is only available 5 out of 12. Now if only we could quantify how delicious the produce is… </p>
+            </div>
+        </div>
+        
+        <div id="part4" style="margin-top:60px">
+            <h2>Part 4: Viz 2</h2>
+            <p>Below is the plot of winning times (in minutes) for Boston Marathon event, separately for men and women.<br> The dashed lines represent the straight-line fits correspondingly for <span style="color:red">men</span> and <span style="color:green">women</span>.</p>
+            <div id = "graphics4" style="margin-top:50px"> 
+                <div id = "graphicsPart4" class="centergraphs"> 
+                </div>
+                <div id = "optionsPart4" class="centergraphs">
+                    <ul>
+                    <li id="men"><span>Data values for <span style="color:red">men</span></span></li>
+                    <li id="women"><span>Data values for <span style="color:green">women</span></span></li>
+                    <li id="all"><span>Data values for <b>all</b> participants</span></li>
+                    <li id="lines"><span><b>Toggle</b> on/off the lines connecting the points</span></li>
+                    </ul>
+                </div>
+            </div>            
+        </div>
+    </div>
+
+    <script type="text/javascript">      
+    
+    /****
+    *Read data part 3
+    ****/
+    var datac = []
+    d3.csv("market.csv", function(data) {
+        var dataaux = [];
+        data.forEach(function(d) {
+            if (dataaux[0] != undefined && d.Month===dataaux[0][0]) {
+                datac.push(dataaux);
+                dataaux = [];
+            }
+            dataaux.push([d.Month,parseFloat(d.Count)]);
+        });
+        datac.push(dataaux);
+        part3BarChart(datac[0], datac[1], datac[2], datac[3]);
+    });
+    
+    /****
+    *Function for part 3
+    ****/
+    function part3BarChart(dataset, dataset2, dataset3, dataset4) {
+        //Width and height
+        var w = 600;
+        var h = 300;
+        var botPadding = 40;
+        var sidePadding = 45;
+                            
+        var months = [];
+        for (var i = 0; i < dataset.length; i++){
+                months.push(dataset[i][0]);
+        }
+        
+        //Scales
+        var xScale = d3.scaleBand() //create an ordinal scale
+                    .domain(months)
+                    .rangeRound([sidePadding, w-sidePadding])
+                    .paddingInner(0.25); //for the bars not touching each other
+        
+        var yScale = d3.scaleLinear()
+                    .domain([0, d3.max(dataset, function(d){ return d[1]; })]) //max of all d[1]
+                    .range([botPadding, h-botPadding]);
+        
+        //Create SVG element
+        var svg = d3.select("#graphic")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+
+        //Create bars
+        svg.selectAll("rect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("x", function(d) {
+                        return xScale(d[0]); // months from Jan to Dec will be scaled to positions in x axis
+            })
+            .attr("y", function(d) {
+                        return h - yScale(d[1]); 
+            })
+            .attr("width", xScale.bandwidth()) //width per bar
+            .attr("height", function(d) {
+                        return yScale(d[1]) - botPadding; 
+            })
+            .attr("fill", function(d) {
+                        return "#ff2a1a";
+            });
+                            
+        //X axis
+        var xAxis = d3.axisBottom();
+        xAxis.scale(xScale);
+        svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0, " + (h - botPadding) + ")")
+                .call(xAxis);
+        //Y axis
+        var yAxis = d3.axisLeft();
+        yAxis.scale(yScale.range([h-botPadding, botPadding]));
+        yAxis.tickFormat(d3.format("d")); 
+        svg.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + (sidePadding) + ",0)")                
+                .call(yAxis);
+                        
+        //Label of the Y axis
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", sidePadding-40)
+            .attr("x",-135)
+            .attr("dy", "1em")
+            .style("font-size", "12px")
+            .style("text-anchor", "middle")
+            .style("font-weight", "bold")
+            .text("# of Unique Kinds of Produce");
+            
+        //Title of the plot
+        svg.append("text")
+                .attr("y",botPadding/2)
+                .attr("x", w/2)
+                .style("font-size", "15px")
+                .style("text-anchor", "middle")
+                .style("font-weight", "bold")
+                .text("NYC Green Markets - Unique Produce Types");
+                        
+        var changeData = function(newDataset, newColor){
+            // update scale to accommodate larger values
+            yScale.domain([0, d3.max(newDataset, function(d){
+                                            return d[1]; //numeric value here
+                                    })]);
+            svg.selectAll("g.y.axis").transition().duration(500).call(yAxis.scale(yScale.range([h-botPadding, botPadding])));
+            // return range to normal for bars
+            yScale.range([botPadding, h-botPadding]);
+
+            // rebind data
+            svg.selectAll("rect")
+                .data(newDataset)
+                .transition() 
+                .duration(500)
+                .ease(d3.easeCubicInOut) 
+                .attr("y", function(d){
+                    return h - yScale(d[1]);
+                    })
+                .attr("height", function(d){
+                    return yScale(d[1]) - botPadding;
+                    })
+                    .attr("fill", function(d){
+                            if(newColor==="red")
+                                return "#ff2a1a";
+                            else if(newColor==="lightred")
+                                return "#ff9ea1";
+                            else if(newColor==="green")
+                                return "#008d14";
+                            else if(newColor==="lightgreen")
+                                return "#c5d2a7";
+                    })
+                        
+        }
+        
+        d3.select("#ff")
+        .on("click", function(){
+                d3.select("g.y.axis").transition().duration(500).call(yAxis.ticks()); 
+                changeData(dataset, "red");
+        });
+        d3.select("#fv")
+        .on("click", function(){
+                d3.select("g.y.axis").transition().duration(500).call(yAxis.ticks(2));
+                changeData(dataset2, "green");
+        });
+        d3.select("#sf")
+        .on("click", function(){
+                d3.select("g.y.axis").transition().duration(500).call(yAxis.ticks());
+                changeData(dataset3, "lightred");
+        });
+        
+        d3.select("#sv")
+        .on("click", function(){
+                d3.select("g.y.axis").transition().duration(500).call(yAxis.ticks());
+                changeData(dataset4, "lightgreen");
+        });
+    }
+    
+    
+    /****
+    *Aux functions for part4
+    ***/
+    //Width and height
+    var w = 600;
+    var h = 350;
+    var padding = 40;
+    var xScale = yScale = svg = xAxis = yAxis = line = null; // for connecting points (path)
+    var menDataset = [];
+    var womenDataset = [];
+    var commonDataset = []; // for both to draw in the beginning
+    var parseYear = d3.timeParse("%Y"); //convert strings to years in Date format
+    var formatYear = d3.timeFormat("%Y"); // and vice versa
+
+    //The values below are for straight-line fit. Calculated outside d3.
+    //Equation of form: y = mx+b
+    var mMEN = -0.28957458338978;
+    var bMEN =708.70572415662;
+    var mWOMEN = -0.9351165327881;
+    var bWOMEN = 2018.0589169718; 
+						
+    var getY = function(x, gender){
+            if(gender==="m"){
+            return mMEN*x + bMEN;
+        }
+        else{
+            return mWOMEN*x + bWOMEN;	
+        }
+    }	
+			
+    // time in format (string) 2:55:10 - convert to minutes only
+    var convertToMinutes = function(stringTime){
+            var minuteString = ""; 
+            var totalMins = 0;  
+            var minutesReached = false;
+            for (var i = 0; i < stringTime.length; i++){
+                    minuteString = minuteString + stringTime.charAt(i); 
+                    if(stringTime.charAt(i) === ':' && (!minutesReached)){ 
+                            minutesReached = true;
+                            var numHours = parseInt(minuteString); 
+                            var numMinutes = numHours * 60; 
+                            totalMins += numMinutes;
+                            minuteString = ""; 
+                            continue;
+                    }
+                    else if (stringTime.charAt(i) === ':' && minutesReached){
+                            var numMinutes = parseInt(minuteString);
+                            totalMins += numMinutes;
+                            break;
+                    }
+            }
+            return totalMins;
+    }
+    //For tooltips
+    function minToHour(numMinutes){
+            var numHours = Math.floor(numMinutes/60);
+            var nh = numHours.toString() + " hours";
+            var remMins = numMinutes - numHours*60;
+            var rm = remMins.toString() + " minutes";
+            return nh + " " + rm;
+    }
+
+    var yearTime = function(row){
+            return{
+                    Year: parseYear(row.Year),
+                    Time: convertToMinutes(row.Time)
+            }
+    
+    }
+    /****
+    *Read from cvs part4
+    ****/
+    d3.csv("men.csv?", yearTime, function(data){
+            d3.csv("women.csv?", yearTime, function(data){
+                    data.map(function(d){
+                        womenDataset.push([d.Year, d.Time, "f"]);
+                    })
+                    addUpdatePlot(womenDataset, "#women"); // add updating plot to women to a paragraph
+                    commonDataset = menDataset.concat(womenDataset);
+                    generatePlot(commonDataset); // generate initial plot with both men and women data
+                    addUpdatePlot(commonDataset, "#all"); // add updating plot to both genders to a paragraph
+            })
+            
+            data.map(function(d){
+                    menDataset.push([d.Year, d.Time, "m"]);
+            })
+            addUpdatePlot(menDataset, "#men"); // add updating plot to men to a paragraph
+    })
+    
+    /****
+    *Function for part 4
+    ****/
+    function generatePlot(datasetP) {
+        //build a plot using desired dataset(will use common as default)
+        //Create scale functions
+        xScale = d3.scaleTime()
+                .domain([d3.min(datasetP, function(d){ return d[0]; }), d3.max(datasetP, function(d){ return d[0]; })])
+                .range([padding, w - padding * 2]);					 
+
+	yScale = d3.scaleLinear()
+		.domain([d3.min(datasetP, function(d){ return d[1]; }), d3.max(datasetP, function(d) { return d[1]; }) + 10])
+		.range([h - padding, padding ]); // +10 to include all the points
+
+	//Define X axis
+	xAxis = d3.axisBottom()
+		.scale(xScale)
+		.ticks(5);
+
+	//Define Y axis
+	yAxis = d3.axisLeft()
+		.scale(yScale)
+		.ticks(5);
+        //Connect points
+        line = d3.line()
+                .x(function(d){return xScale(d[0]);})
+                .y(function(d){return yScale(d[1]);});
+                
+                
+	//Create SVG element
+	svg = d3.select("#graphicsPart4")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+        //Append clipping path (avoid points going outside axes)
+        svg.append("clipPath")
+                .attr("id","chart-area")
+                .append("rect")
+                .attr("x",padding)
+                .attr("y",padding)
+                .attr("width",w - padding * 3)
+                .attr("height",h-padding*2);
+        
+        //Create points
+        svg.append("g")
+                .attr("id","points")
+                .attr("clip-path","url(#chart-area)")
+                .selectAll("point")
+                .data(datasetP)
+                .enter()
+                .append("text")
+                .text(function(d){
+                        if (d[2]==="f"){
+                                return "○";
+                        }
+                        else {
+                                return "◇";
+                        }
+                })
+                .attr("id","point")
+                .attr("x", function(d) {
+                                return xScale(d[0]);
+                })
+                .attr("y", function(d) {
+                                return yScale(d[1]);
+                })
+                .attr("fill", "black")
+                .on("mouseover", function(d) {
+                    //Get this point's x/y values, then add the tooltip
+                    var xPosition = parseFloat(d3.select(this).attr("x")) + 20;
+                    var yPosition = parseFloat(d3.select(this).attr("y")) - 34;
+                    //Create the tooltip label
+                    svg.append("text")
+                    .attr("id", "tooltip")
+                    .attr("x", function(d){
+                            if(xPosition > (w-20)){
+                                return xPosition-30; 
+                            }
+                            else if(xPosition < 70){
+                                return xPosition+30;
+                            }
+                            return xPosition;
+                        })
+                        .attr("y", function(d){
+                            if(yPosition < (h+24)){
+                               return yPosition+17;
+                            }
+                            return yPosition;
+                        })
+                    .attr("text-anchor", "middle")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "11px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "black")
+                    .text(minToHour(d[1]) + ", " + formatYear(d[0]) );
+
+                })
+                .on("mouseout", function() {			   
+                    //Remove the tooltip
+                    d3.select("#tooltip").remove();
+                });
+
+			
+        //Create X axis
+        svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + (h - padding) + ")")
+                .call(xAxis);
+
+        //Create Y axis
+        svg.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + padding + ",0)")
+                .call(yAxis);
+        
+        svg.append("path")
+                .datum(womenDataset) 
+                .attr("id","womenLine")
+                .attr("class","line")
+                .attr("d", line);
+        
+        svg.append("path")
+                .datum(menDataset) 
+                .attr("id","menLine")
+                .attr("class","line")
+                .attr("d", line);
+
+
+        //Toggle lines connecting the dots
+        var linesVisible = true; // default value
+
+        svg.selectAll(".line").style("opacity",function(){
+                if(linesVisible){
+                        return '1';
+                }
+                else{
+                        return '0';
+                }
+        });		
+        d3.select("#lines")
+            .on("click", function(){
+                if(!linesVisible){
+                        svg.selectAll(".line").style("opacity",1);		
+                        linesVisible = true;
+                }
+                else{
+                        svg.selectAll(".line").style("opacity",0);		
+                        linesVisible = false;
+                }
+            })	
+
+
+        // X axis label  	
+        svg.append("text")
+                .attr("x", (w/ 2))
+                .attr("y", h)
+                .attr("class", "text-label")
+                .attr("text-anchor", "middle")
+                .text("Year");
+        // Y axis label	
+        svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -5)
+        .attr("x",0 - (h / 2) + 3)
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Finish time(min)");
+        
+        // Chart name
+        svg.append("text")
+            .attr("x", (w/ 2)-10)
+            .attr("y", 20)
+            .attr("class", "text-label")
+            .attr("text-anchor", "middle")
+            .text("Boston marathon winning times for men and women")
+            .attr("font-weight","bold");
+
+
+        // Straight line fit - values of slope and intersect calculated outside d3
+        // Values m and b come before the method	
+        //y=mx+b
+
+        var trendlineMen = svg.selectAll(".trendlineMen")
+                .data(menDataset);
+
+        var minYearMEN = d3.min(menDataset, function(d){ return d[0]; }); //date
+        var maxYearMEN = d3.max(menDataset, function(d){ return d[0]; }); //date
+
+        trendlineMen.enter()
+                .append("line")
+                .attr("class", "trendline")
+                .attr("id", "menTrendLine")
+                .attr("x1", xScale(minYearMEN))
+                .attr("y1", yScale(getY(formatYear(minYearMEN), "m")))
+                .attr("x2", xScale(maxYearMEN))
+                .attr("y2", yScale(getY(formatYear(maxYearMEN), "m")))
+                .attr("stroke", "red")
+                .attr("stroke-width", 1);
+
+        var trendlineWomen = svg.selectAll(".trendlineWomen")
+                .data(womenDataset);
+        var minYearWOMEN = d3.min(womenDataset, function(d){ return d[0]; }); //date
+        var maxYearWOMEN = d3.max(womenDataset, function(d){ return d[0]; }); //date
+
+        trendlineWomen.enter()
+                .append("line")
+                .attr("class", "trendline")
+                .attr("id", "womenTrendLine")
+                .attr("x1", xScale(minYearWOMEN))
+                .attr("y1", yScale(getY(formatYear(minYearWOMEN), "f")))
+                .attr("x2", xScale(maxYearWOMEN))
+                .attr("y2", yScale(getY(formatYear(maxYearWOMEN), "f")))
+                .attr("stroke", "darkgreen")
+                .attr("stroke-width", 1);
+    }    
+    
+    //Part 4:add updating plot to desired dataset to the paragraph
+    function addUpdatePlot(desiredDataset, elementToBind) {
+        //On click, update with new data			
+        d3.select(elementToBind)
+        .on("click", function() {
+            //Update scale domains
+            xScale.domain([
+                    d3.min(desiredDataset, function(d) { return d[0]; }), d3.max(desiredDataset, function(d) { return d[0]; })
+                    ]);
+            yScale.domain([
+                    d3.min(desiredDataset, function(d) { return d[1]; }), d3.max(desiredDataset, function(d) { return d[1]; }) + 10
+                    ]);
+            //Update values of axes
+            svg.select(".x.axis")
+                    .transition()
+                    .duration(1000)
+                    .call(xAxis);
+            svg.select(".y.axis")
+                    .transition()
+                    .duration(1000)
+                    .call(yAxis);
+                
+            //UPDATE THE PATHS                
+            var menLine = svg.select("#menLine");
+            var womenLine = svg.select("#womenLine");
+
+            if(elementToBind === "#men"){ // update men path, get rid of women one
+                    
+                    menLine.datum(desiredDataset).attr("d", function(d){return line(d)});
+                    menLine.append("path")
+                                .attr("d",function(d){return line(d)});
+                    menLine.exit().remove();
+
+                    womenLine.attr("d", function(d){return line(0)});
+
+            }
+            else if(elementToBind === "#women"){  // update women path, get rid of men one
+                    
+                    womenLine.datum(desiredDataset).attr("d", function(d){return line(d)});
+                    womenLine.append("path")
+                                .attr("d",function(d){return line(d)});
+                    womenLine.exit().remove();
+
+                    menLine.attr("d", function(d){return line(0)});
+            
+            }
+            else{								
+                    menLine.attr("d", function(d){return line(d)});
+                    menLine.append("path")
+                                .attr("d",function(d){return line(d)});
+                    menLine.exit().remove();
+
+                    womenLine.attr("d", function(d){return line(d)});
+                    womenLine.append("path")
+                                .attr("d",function(d){return line(d)});
+                    womenLine.exit().remove();
+            }        
+                
+            //Update all symbols
+            var selection = svg.selectAll("#point")
+                .data(desiredDataset);
+                    
+            selection.transition()
+                .duration(750)
+                .text(function(d){
+                            if (d[2] === "m"){
+                                    return "◇";
+                            }
+                        else if (d[2] === "f"){
+                                    return "○";
+                            }
+                            else{
+                                    return "N/A";
+                            }
+                })
+                .attr("x", function(d) {
+                            return xScale(d[0]);
+                })
+                .attr("y", function(d) {
+                            return yScale(d[1]);
+                })
+                .attr("fill","black");
+                            
+            selection.enter()
+            .append("text")
+            .attr("id", "point")
+            .attr("x", w-10)
+            .transition()
+            .duration(750)
+            .attr("x", function(d) {
+            return xScale(d[0]);
+            })
+            .attr("y", function(d) {
+            return yScale(d[1]);
+            })
+            .text(function(d){
+                if (d[2] === "m"){
+                        return "◇";
+                }
+                else if (d[2] === "f"){
+                        return "○";
+                }
+                else{
+                        return "N/A";
+                }
+            })
+            .attr("fill", "black");
+                        
+            // remove old dataset from the plot 
+            selection.exit()
+            .transition()
+            .duration(750)
+            .attr("x", w) // slowly slide to the right side of the svg and then disappear
+            .remove();
+
+            // update tooltips					   
+            d3.selectAll("#point").on("mouseover", function(d) {
+                var xPosition = parseFloat(d3.select(this).attr("x")) + 20; 
+                var yPosition = parseFloat(d3.select(this).attr("y")) - 34;
+
+                svg.append("text")
+                .attr("id", "tooltip")
+                .attr("x", function(d){
+                            if(xPosition > (w-20)){
+                                return xPosition-30; 
+                            }
+                            else if(xPosition < 70){
+                                return xPosition+30;
+                            }
+                            return xPosition;
+                        })
+                        .attr("y", function(d){
+                            if(yPosition < (h+24)){
+                               return yPosition+17;
+                            }
+                            return yPosition;
+                        })
+                .attr("text-anchor", "middle")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "11px")
+                .attr("font-weight", "bold")
+                .attr("fill", "black")
+                .text(minToHour(d[1]) + ",\r\n " + formatYear(d[0]) );
+
+            })
+            .on("mouseout", function() {
+                    d3.select("#tooltip").remove();        
+            });
+
+
+            // update line fit
+            var minYearMEN = d3.min(menDataset, function(d){ return d[0]; }); //date
+            var maxYearMEN = d3.max(menDataset, function(d){ return d[0]; }); //date
+            var minYearWOMEN = d3.min(womenDataset, function(d){ return d[0]; }); //date
+            var maxYearWOMEN = d3.max(womenDataset, function(d){ return d[0]; }); //date
+
+            var menTrendLine = svg.selectAll("#menTrendLine");
+            var womenTrendLine = svg.selectAll("#womenTrendLine");
+
+            if(elementToBind === "#men"){		  // update men trend, get rid of women one
+                svg.selectAll("#menTrendLine").style("opacity",1);
+                svg.selectAll("#womenTrendLine").style("opacity",0);
+                menTrendLine.data(desiredDataset)
+                .attr("x1", xScale(minYearMEN))
+                .attr("y1", yScale(getY(formatYear(minYearMEN), "m")))
+                .attr("x2", xScale(maxYearMEN))
+                .attr("y2", yScale(getY(formatYear(maxYearMEN), "m")))
+            }
+            else if(elementToBind === "#women"){  // update women trend, get rid of men one
+                svg.selectAll("#womenTrendLine").style("opacity",1);
+                svg.selectAll("#menTrendLine").style("opacity",0);
+                
+                womenTrendLine.data(desiredDataset)
+                .attr("x1", xScale(minYearWOMEN))
+                .attr("y1", yScale(getY(formatYear(minYearWOMEN), "f")))
+                .attr("x2", xScale(maxYearWOMEN))
+                .attr("y2", yScale(getY(formatYear(maxYearWOMEN), "f")))
+            }
+            else{	// update both trendlines
+                svg.selectAll("#menTrendLine").style("opacity",1);
+                svg.selectAll("#womenTrendLine").style("opacity",1);
+                womenTrendLine.data(desiredDataset)
+                .attr("x1", xScale(minYearWOMEN))
+                .attr("y1", yScale(getY(formatYear(minYearWOMEN), "f")))
+                .attr("x2", xScale(maxYearWOMEN))
+                .attr("y2", yScale(getY(formatYear(maxYearWOMEN), "f")))
+                menTrendLine.data(desiredDataset)
+                .attr("x1", xScale(minYearMEN))
+                .attr("y1", yScale(getY(formatYear(minYearMEN), "m")))
+                .attr("x2", xScale(maxYearMEN))
+                .attr("y2", yScale(getY(formatYear(maxYearMEN), "m")))
+            }
+        });
+    }
+    </script>    
+    </body>
+</html>
