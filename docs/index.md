@@ -3,6 +3,8 @@
 
 [Assignment 2](https://thomasnilsson.github.io/02806/A2)
 
+[Assignment 2](../A2)
+
 ## Weekly Exercises
 [Week 1](https://thomasnilsson.github.io/02806/week1)
 
