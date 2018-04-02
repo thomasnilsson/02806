@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Week 7</title>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body style="background-color:rgb(28,28,28)">
+	<div align="middle" style="margin: 50px">
+		<h2 style="color:white">02806: Social Data Analysis and Visualisation </h2>
+	</div>
+
+</body>
+<script>
+let content = d3.select("body").select("div")
+
+let addLink = (text, link) => content.append("a")
+	.text(text)
+	.style("font-size", "20px")
+	.attr("href", link)
+	.append("p")
+
+let addWeekButton = w => addLink("Exercises Week #" + w, "W" + w)
+
+let addAssignmentButton = a => addLink("Assignment #" + a, "A" + a)
+
+let assignments = [1,2]
+let weeks = [1,2,3,4,5,6,7]
+
+for (i in assignments) {
+	let a = assignments[i]
+	addAssignmentButton(a)
+}
+
+for (i in weeks) {
+	let w = weeks[i]
+	addWeekButton(w)
+}
+</script>
+
+</html>
