@@ -182,7 +182,6 @@
                 )
 
             function animate() {
-                console.log("ahoods")
                     d3.select("#gBrush")
                     // Move brush to the start of timeline
                     .call(brush.move, // Creates initial Window

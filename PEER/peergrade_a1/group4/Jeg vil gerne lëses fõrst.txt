@@ -1,4 +1,0 @@
-D3.js kan ikke køre i Chrome browser, prøv at bruge Edge.
-
-Hvis diagrammerne ligger oven i hinanden, prøv at opdatere siden, så skulle 
-de ligge rigtigt. 

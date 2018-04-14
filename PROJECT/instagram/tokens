@@ -1,8 +1,0 @@
-CLIENT INFO
-CLIENT ID	4e5374043f814616a58d9fdd53ea999d
-SUPPORT EMAIL	thomasnilsson@edea.dk
-CLIENT STATUS	Sandbox Mode
-
-https://api.instagram.com/oauth/authorize/?client_id=4e5374043f814616a58d9fdd53ea999d&redirect_uri=https://thomasnilsson.github.io&response_type=code
-
-https://thomasnilsson.github.io?code=CODE

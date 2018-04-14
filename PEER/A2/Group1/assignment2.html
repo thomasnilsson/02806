@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <title>Assignment 2</title>
+      <link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
+      <script type="text/javascript" src="d3.js"></script>
+
+  </head>
+  <body>
+        <!-- Navbar (sit on top) -->
+      <div class="w3-top">
+        <div class="w3-bar w3-white w3-wide w3-padding-8 w3-card-2">
+          <a href="#home" class="w3-margin-left w3-bar-item w3-button"><b><font color =#f44336>Social data</font></b> analysis and visualization</a>
+          <!-- Float links to the right. Hide them on small screens -->
+          <div class="w3-right w3-hide-small">
+            <a href="#Partone" class="w3-bar-item w3-button">Part 1</a>
+            <a href="#graph" class="w3-bar-item w3-button">Part 2</a>
+          </div>
+        </div>
+      </div>
+      <br><br>
+    <!-- Page content -->
+    <div class="w3-content w3-padding" style="max-width:1564px">
+      
+      <div class="w3-container w3-padding-32" id="Partone">
+        <h3 class="w3-border-bottom w3-border-light-grey w3-padding-12">Part 1</h3>
+        <b>What is the Oxford English Dictionary's defintion of a narrative?</b><br>
+        The oxford english dictionary defines a narrative as: “A spoken or written account of connected events; a story”. And the example used: “a gripping narrative”<br><br>
+        <b>What is your favorite visualization among the examples in section 3? Explain why in a few words.</b><br>
+        Overall i quite like the Afganistan one, it has a good blend of text and visualized information. The tabs and timeline additions allows for a story to be explored across regions and gives a simple overview of the nation. <br><br>
+        <b>What's the point of Figure 7?</b><br>
+        It provides an overview of the different visualizations common elements. Given this visualization we may determine the common design choices used in data visualization and their popularity. Lastly we may also see how these compare to different types (genres) of visualizations.<br><br>
+        <b>Use Figure 7 to find the most common design choice within each category for the Visual narrative and Narrative structure (the categories within visual narrative are 'visual structuring', 'highlighting', etc).</b><br>
+        Going through each category we may identify the most commonly used elements as (in order of category): “consistent visual platform”, “feature distinction”, “object continuity”, “user directed path”, “filtering / selection / search” and lastly “captions / headlines”<br><br>
+        <b>Check out Figure 8 and section 4.3.What is your favorite genre of narrative visualization? Why? What is your least favorite genre? Why?</b><br>
+        Most genres in the case of figure 8 can be translated to other genres, although none as smoothly as film, generally the genre can be said to smoothly host any of the other genres even in combinations. This transition and flexibility allows film to often portray quite complex narratives smoothly. Further most often its usage may quickly and simply describe, visualize complex transitions smoothly. Therefore we consider film to be the favorite.<br><br>
+        While flowcharts are most often used heavily in software engineering, it should be noted they quickly become complex and loses part of their narrative ability due to this complexity. One could go as far as saying one fails to see the forest for the trees, that is to say the flow might overshadow the narrative as a whole. Therefore we would say it is our least favorite genre.<br><br>
+      </div>
+
+      <div class="w3-container w3-padding-32" id="graph">
+       <h3 class="w3-border-bottom w3-border-light-grey w3-padding-12">Part 2</h3>
+       <div class="w3-container w3-padding-32" id="barLocation"> </div>
+       <div class="w3-container w3-padding-32" id="buttonLocation"></div>
+       <center><div class="w3-container w3-padding-32" id="graphLocation"></center>
+      </div>
+      <div id="bar">
+      </div>
+    </div>
+      <script type="text/javascript">
+     
+      //Width and height
+      var w = 1000;
+      var h = 1000;
+      var w2 = 1500;
+      var h2 = 200;
+      var padding = 50;
+      var parseTime = d3.timeParse("%m/%d/%Y");
+
+      //Insert data:
+      var dataset;
+      d3.csv("all_murder.csv", function(error,data){
+        if(error){
+          console.log(error)
+        }else{
+          console.log(data);
+          dataset = data;
+          chart();
+        }
+      });
+
+    function chart(){
+      var nested_data = d3.nest()
+      .key(function(d) { return d.RPT_DT; })
+      .rollup(function(leaves) { return leaves.length; })
+      .entries(dataset);      
+
+      console.log(nested_data);
+
+    var xScale = d3.scaleTime()
+    .domain([d3.min(nested_data, function(d) { return parseTime(d.key); }), d3.max(nested_data, function(d) { return  parseTime(d.key); })])
+    .range([padding, w2 - padding * 2]);
+    
+    var yScale = d3.scaleLinear()
+     .domain([0, d3.max(nested_data, function(d) { return d.value; })])
+     .range([h2 - padding,padding]);
+
+    var xAxis =  d3.axisBottom()
+      .scale(xScale)
+      .tickFormat(d3.timeFormat("%Y"));
+
+    //Define Y axis
+    var yAxis = d3.axisLeft()
+      .scale(yScale);
+
+    //Create SVG
+    var svg = d3.select("#barLocation")
+          .append("svg")
+          .attr("width", w2)
+          .attr("height", h2);
+
+    //populate SVG
+    svg.selectAll("rect")
+      .data(nested_data)
+      .enter()
+      .append("rect")
+      .attr("x", function(d, i) {
+         return xScale(parseTime(d.key));
+      })
+      .attr("y", function(d) {
+         return yScale(d.value);
+      })
+      .attr("width", w2 / nested_data.length)
+      .attr("height", function(d) {
+        return h2- yScale(d.value) - padding;
+      })
+      .attr("fill", function(d) {
+       return "rgb(0, 0, " + Math.round(d.value * 10) + ")";
+      });
+
+    //Add X axis
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + (h2 - padding) + ")")
+      .call(xAxis);
+    
+    //Add Y axis
+    svg.append("g")
+      .attr("class", "y axis")
+      .attr("transform", "translate(" + padding + ",0)")
+      .call(yAxis);
+    svg.append("text")
+      .attr("x", (w2 / 2))             
+      .attr("y", 0 + (30 / 2))
+      .attr("text-anchor", "middle")  
+      .style("font-size", "16px") 
+      .style("text-decoration", "underline")  
+      .text("Murders per date");
+      // text label for the y axis
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0)
+      .attr("x",0 - (h2 / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("# of murders comiited");
+
+    // text label for the x axis
+    svg.append("text")
+      .attr("x", (w2 / 2.3))             
+      .attr("y", h2/1.05)
+      .attr("text-anchor", "middle")  
+      .style("font-size", "16px") 
+      .text("Year");
+
+    // Create Brush
+    var brushWidth = 200;
+    var resizebarWidth = 10;
+    var startX = padding ;
+    var leftX = startX - (resizebarWidth/2);
+    var rightX = startX + brushWidth - (resizebarWidth/2);
+
+    var drag = d3.drag()
+    .on("drag", dragmove);
+
+    var resizeright = d3.drag()
+    .on("drag", rResize);
+
+    var resizeleft = d3.drag()
+    .on("drag", lResize);
+
+    var brush = svg.append("g")
+      .data([{x:startX}]);
+
+    var brushDrag = brush.append("rect")
+      .attr("x", startX)
+      .attr("y", padding)
+      .attr("height", h2-padding*2)
+      .attr("width", brushWidth)
+      .attr("opacity", .2)
+      .attr("stroke", "gray")
+      .attr("stroke-width", 2)
+      .attr("cursor", "move")
+      .call(drag);
+
+    var resizebarleft = brush.append("rect")
+      .attr("x", leftX)
+      .attr("y", padding)
+      .attr("height", h2-padding*2)
+      .attr("width", resizebarWidth)
+      .attr("fill-opacity", 0)
+      .attr("cursor", "ew-resize")
+      .call(resizeleft);
+
+
+    var resizebarright = brush.append("rect")
+      .attr("x", rightX)
+      .attr("y", padding)
+      .attr("height", h2-padding*2)
+      .attr("width", resizebarWidth)
+      .attr("fill-opacity", 0)
+      .attr("cursor", "ew-resize")
+      .call(resizeright);    
+
+
+
+    function dragmove(d) {
+      brushDrag
+        .attr("x", d.x = Math.max(padding, Math.min((w2-brushWidth - padding * 2), d3.event.x)));
+      resizebarleft
+        .attr("x", leftX = d.x - (resizebarWidth/2));
+      resizebarright
+        .attr("x", rightX = d.x + brushWidth - (resizebarWidth/2));
+      murderMap
+        .style("opacity", function(d){
+          return (xScale(parseTime(d.RPT_DT)) > leftX && xScale(parseTime(d.RPT_DT)) < rightX ? 0.75 : 0)
+        });
+    }
+
+    function lResize(d) {
+      var oldx = d.x;       
+
+      d.x = Math.max(padding, Math.min(d.x + brushWidth - (resizebarWidth / 2), d3.event.x)); 
+      leftX = d.x - (resizebarWidth/2);
+      brushWidth = brushWidth + (oldx - d.x);
+      resizebarleft
+        .attr("x", leftX);
+      resizebarright
+        .attr("x", rightX);
+       
+      brushDrag
+        .attr("x", d.x)
+        .attr("width", brushWidth);
+      murderMap
+        .style("opacity", function(d){
+          return (xScale(parseTime(d.RPT_DT)) > leftX && xScale(parseTime(d.RPT_DT)) < rightX ? 0.75 : 0)
+        });     
+      }
+
+    function rResize(d) {
+
+      var resizex = Math.max(d.x + (resizebarWidth/2), Math.min((w2 - padding * 2), d.x + brushWidth + d3.event.dx));
+
+      brushWidth = resizex - d.x;
+      rightX = resizex - (resizebarWidth/2);
+
+      resizebarright
+        .attr("x", rightX);
+      resizebarleft
+        .attr("x", leftX);
+      brushDrag
+        .attr("width", brushWidth);
+      murderMap
+        .style("opacity", function(d){
+          return (xScale(parseTime(d.RPT_DT)) > leftX && xScale(parseTime(d.RPT_DT)) < rightX ? 0.75 : 0)
+        });
+    }
+
+    var svgButton = d3.select("#buttonLocation")
+          .append("svg")
+          .attr("width", w2)
+          .attr("height", 100);
+
+
+    //Animation
+    var tempLeft;
+    var tempRight;
+    var AnimationButton = svgButton.append("rect")
+      .attr("width", 200)
+      .attr("height", 100)
+      .attr("x", w2/2 - 100)
+      .attr("fill", "#E0E0E0")
+      .attr("stroke", "#BDBDBD")
+      .attr("stroke-width", 2)
+      .attr("rx", 25)
+      .attr("cursor", "pointer")
+      .on("click", function(){
+        tempLeft = leftX;
+        tempRight = rightX;
+        return animate(padding);
+      });
+
+    svgButton.append("text")
+      .attr("x", (w2/2))             
+      .attr("y", padding+5)
+      .attr("text-anchor", "middle")  
+      .style("font-size", "30px") 
+      .attr("pointer-events", "none")
+      .text("Play!"); 
+
+
+    function animate(aniX){
+      if (aniX < (w2-brushWidth - padding * 2)){
+      leftX = aniX - (resizebarWidth/2);
+      rightX = aniX + brushWidth - (resizebarWidth/2);
+      brushDrag
+        .transition()
+        .duration(500)        
+        .attr("x", aniX = Math.max(padding, Math.min((w2-brushWidth - padding * 2), aniX)))
+        .on("end", function() {animate(aniX+50)});
+      resizebarleft
+        .attr("x", leftX);
+      resizebarright
+        .attr("x", rightX);
+      murderMap
+        .style("opacity", function(d){
+          return (xScale(parseTime(d.RPT_DT)) > leftX && xScale(parseTime(d.RPT_DT)) < rightX ? 0.75 : 0)
+        });
+      }
+      else {
+        aniX = w2-brushWidth - padding * 2
+        leftX = aniX - (resizebarWidth/2);
+        rightX = aniX + brushWidth - (resizebarWidth/2);
+        brushDrag
+          .transition()
+          .duration(500)        
+          .attr("x", aniX = Math.max(padding, Math.min((w2-brushWidth - padding * 2), aniX)))
+          .on("end", function(){reset(tempLeft + (resizebarWidth/2), tempLeft, tempRight)});
+        resizebarleft
+          .attr("x", leftX);
+        resizebarright
+          .attr("x", rightX);
+        murderMap
+          .style("opacity", function(d){
+            return (xScale(parseTime(d.RPT_DT)) > leftX && xScale(parseTime(d.RPT_DT)) < rightX ? 0.75 : 0)
+          });
+      }
+    }
+
+    function reset(prevX, prevLeft, prevRight){
+      leftX = prevLeft
+      rightX = prevRight
+      brushDrag
+        .transition()
+        .duration(1000)        
+        .attr("x", prevX = Math.max(padding, Math.min((w2-brushWidth - padding * 2), prevX)))
+        .on("end", function(){null});
+      resizebarleft
+        .attr("x", leftX);
+      resizebarright
+        .attr("x", rightX);
+      murderMap
+        .style("opacity", function(d){
+          return (xScale(parseTime(d.RPT_DT)) > leftX && xScale(parseTime(d.RPT_DT)) < rightX ? 0.75 : 0)
+        });
+    }
+
+
+
+//--------------------------------------------------------------------------------------------------
+// Geo data
+//--------------------------------------------------------------------------------------------------
+
+      //Define path generator, using the Albers USA projection
+      var projection  = d3.geoMercator()
+        .translate([w, h])
+        .center([-73.4,40.2])
+        .scale(60000);
+
+       var color = d3.scaleOrdinal(["green","yellow","orange","red","purple"]);
+       var borNames = ["Staten Island", "Queens", "Brooklyn", "Manhatten", "Bronx"]
+              
+
+      var path = d3.geoPath().projection(projection );
+      //Create SVG element
+      var svg = d3.select("#graphLocation")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+
+      //Load in GeoJSON data
+      d3.json("boroughs.json", function(json) {
+        console.log("data loaded");
+        //Bind data and create one path per GeoJSON feature
+        svg.selectAll("path")
+           .data(json.features)
+           .enter()
+           .append("path")
+           .attr("d", path)
+           .style("fill",function(d,i){
+            return color(i);
+           });
+
+        murderMap = svg.selectAll("circle")
+        .data(dataset)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d){
+          return projection([d.Longitude,d.Latitude])[0];
+        })
+        .attr("cy", function(d){
+          return projection([d.Longitude,d.Latitude])[1];
+        })
+        .attr("r",4)
+        .style("fill","black")
+        .style("stroke","gray")
+        .style("stroke-width",0.25)
+        .style("opacity", function(d){
+          return (xScale(parseTime(d.RPT_DT)) > leftX && xScale(parseTime(d.RPT_DT)) < rightX ? 0.75 : 0)
+        });
+
+         svg.selectAll("text")
+        .data(json.features)
+        .enter()
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("class", "label")
+        .style("font-size", "20px")
+        .style("font-weight", "bolder")
+        .attr("stroke", "white")
+        .attr("stroke-width", 0.5)
+        .attr("x", function(d) {
+          return path.centroid(d)[0];
+        })
+        .attr("y", function(d) {
+          return path.centroid(d)[1];
+        })
+        .text(function(d, i) {
+          return borNames[i];        
+        });
+
+      });
+
+     
+
+
+
+      }
+
+
+ 
+      </script>
+  </body>
+</html>

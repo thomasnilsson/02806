@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Scaling the Albers USA projection</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<button id="play">Animate</button>
+		<style type="text/css">
+			body {
+				width: 60%;
+				margin-left:auto;
+				margin-right:auto;
+			}
+			h1{
+				text-align: center;
+			}
+			p {
+				text-align: justify;
+			}
+			.brushed {
+	            fill: teal;
+	            stroke: none;
+	            opacity: 0.5;
+	    }
+
+      .non_brushed {
+          fill: none;
+          opacity: 0.75;
+      }
+
+			.line {
+				fill: none;
+				stroke: teal;
+				stroke-width: 1;
+			}
+			.axis {
+				font-size: 8px;
+			}
+
+
+		</style>
+	</head>
+	<body>
+		<h1>
+			Social Data Analysis and Visualization:</h1>
+		<h1>
+			Assignment 2</h1>
+		<h2>Part 1: Telling Data Stories</h2>
+		<p>1. <u>What is the Oxford English Dictionary's defintion of a narrative?</u></p>
+		<p>The Oxford English Dictionary defines narrative as “an account of a series of events, facts, etc., given in order and with the establishing of connections between them.” Central to this definition is the notion of a chain of causally related events. The article mentions this definition to introduce the concept of story telling into data visualization.</p>
+		<p>2. <u>What is your favourite visualization among the example in section 3?</u></p>
+		<p>Among all visualizations from section 3 we like the “Budget forecasts” the most. Its simplicity allows us to gain the essential information easily while keeping high level of visualialization quality. While keeping the simple idea of a slide show, it still offers user interactivity (with the progress bar and mouse-over) which makes the visualization clear and the narrative consistent.</p>
+		<p>3. <u>What is the point of Figure 7?</u></p>
+		<p>The figure represents the design space of Narrative Visualization, which is divided into Visual Narrative and Narrative Structure. The point of Figure 7 is to emphasize which designs elements of Visual Narrative and Narrative Structure are used (or rather omitted) by the different genres of Narrative Visualization.</p>
+		<p>4. <u>Use Figure 7 to find the most common design choice within each category for the Visual Narrative and Narrative Structure.</u></p>
+		<p>The most used designs by category are:</p>
+		<ul>
+			<li>Visual Narrative:
+				<ul>
+					<li>Visual Structuring: Consistent Visual Platform.</li>
+					<li>Highlighting: Feature Distinction.</li>
+					<li>Transition guidance: Object Continuity</li>
+				</ul>
+			</li>
+			<br>
+			<li>Narrative Structure:</li>
+				<ul>
+					<li>Ordering: User Directed Path.</li>
+					<li>Interactivity: Filtering / Selection / Search.</li>
+					<li>Messaging: Captions / Headlines.</li>
+				</ul>
+		</ul>
+		<p>5. <u>What are your favourite and least favourite genre of Narrative Visualization?</u></p>
+		<p>From a student point of view, our favourite genre is <i>Film / Video / Animation</i> due to its effectiveness to explain topics visually and by words, which results in the viewers' clear understanding of the presented information.</p>
+		<p>Our least favourite Narrative Visualization genre is <i>Magazine Style</i> because it uses mainly text to transfer information. Its lack of visualizations and interactivity makes it harder to understand and memorize the message it wants to give.</p>
+		<h2>Part 2: Visualizing Murders over Time</h2>
+		<p>This visualization is divided in three main parts, which are realted between each other. However, they are  intended to be understood as one single dashboard; reason why there is only one title in the middle (to avoid redundancy and excesssive text). The top left of the dashboard shows a map of New York City divided by boroughs with teal circles at the locations where there has been a murder (from 2006 to 2016, both included). The top right is a histogram of the number of murders that occurred in NYC by hour of the day. For example, the first column shows the number of murders between midnight and 1am. Finally, the bottom graphic is a timeline line chart with the number of murders in NYC from 2006 to 2016.</p>
+		<p>We have implemented two interactions for this visualization. First of all, a brush in the timeline that allows for the selection of a range of dates. Both the circles in the map and the histogram are filtered with the date range to show only the corresponding data. Second, we have implemented and "Animate" button that sets the brush to a width equal to the number of days set in the text input box next to the button and then transitions the brush from beginning to end. To re-set the brush, you can double-click anywhere in the timeline line chart. The transition when re-setting is a bit less smooth than the rest due to the big amount of data processed.</p>
+		<p style="font-size:22px;font-weight:bold;align:center;text-align:center">NYC Murders by Borough</p>
+		<div id="map_bar" style="height: 500px; width: 850px;">
+			<div id="map" style="height: 100%; width: 59%; float:left;"></div>
+			<div id="bar" style="height: 70%; width: 41%; float:right;margin-top:50px;"></div>
+		</div>
+		<div id="line" style="height: 200px; width: 850px;"></div>
+		<script type="text/javascript">
+
+			function placeEl(str_id,x_pos, y_pos) {
+				if (typeof(str_id) == "string"){
+					var d = document.getElementById(str_id);
+				}
+				else {d = str_id}
+				d.style.position = "absolute";
+				d.style.left = x_pos+'px';
+				d.style.top = y_pos+'px';
+			}
+
+			input_text = document.createElement("INPUT");
+			input_text.setAttribute("type", "text");
+	    input_text.setAttribute("value", "365");
+			input_text.style.width = "40px"
+	    document.body.appendChild(input_text);
+
+			w_window = 0.6*window.innerWidth;
+			h_window = 0.9*window.innerHeight;
+			/*var x = document.createElement("INPUT");
+			x.setAttribute("type","text")
+			 .setAttribute("value",200)*/
+			//Width and height
+			var h_line = 200/700*h_window
+			var h = 400/700*h_window;
+			var padding = 20;
+			var w_bar = 350/850*w_window;
+			var w_map = 500/850*w_window;
+			var h_map = 500/700*h_window;
+			var w = (w_bar+w_map)/2;
+
+			placeEl("play",window.parent.document.getElementById("map").offsetLeft + w_map-200,window.parent.document.getElementById("map").offsetTop + h_map-60)
+			placeEl(input_text,window.parent.document.getElementById("map").offsetLeft + w_map-130,window.parent.document.getElementById("map").offsetTop + h_map-31)
+
+
+
+			document.getElementById("map_bar").style.height = h_map+'px';
+			document.getElementById("map_bar").style.width = (w_map+w_bar)+'px';
+			document.getElementById("line").style.height = h_line+'px';
+			document.getElementById("line").style.width	 = (w_map+w_bar)+'px';
+			//Define map projection
+			var projection = d3.geoMercator()
+								 .center([-73.98, 40.71])
+							   .translate([w_map/2, h_map/2])
+							   .scale(d3.min([w_map*100,h_map*100]));
+
+			var color = {"Staten Island":"rgb(200,200,200)","Queens":"rgb(120,120,120)","Brooklyn":"rgb(152,152,152)","Manhattan": "rgb(184,184,184)","Bronx":"rgb(232,232,232)"};
+			//Define path generator
+			var path = d3.geoPath()
+							 .projection(projection);
+
+			//Create SVG element
+
+			var svg = d3.select("#map")
+						.attr("id","svg_map")
+						.append("svg")
+						.attr("width", w_map)
+						.attr("height", h_map);
+
+			var svg_bar = d3.select("#bar")
+						.attr("id","svg_bar")
+						.append("svg")
+						.attr("width", w_bar)
+						.attr("height", h);
+
+			var svg_line = d3.select("#line")
+						.attr("id","svg_line")
+						.append("svg")
+						.attr("width",2*w)
+						.attr("height",h_line)
+
+			var xScale = d3.scaleTime();
+
+			var yScale = d3.scaleLinear()
+			        .range([h_line,3*padding]);
+
+			var xAxis = d3.axisBottom()
+			          .scale(xScale)
+			          .ticks(11);
+
+			var yAxis = d3.axisLeft()
+			          .scale(yScale)
+			          .ticks(8);
+
+			var xScale_bar = d3.scaleBand()
+			        .domain([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
+			        .rangeRound([padding+5, w_bar-padding])
+			        .paddingInner(0.05);
+
+			var yScale_bar = d3.scaleLinear()
+			        .range([h,2*padding+5]);
+
+			var xAxis_bar = d3.axisBottom()
+			          .scale(xScale_bar)
+			          .ticks(11	);
+
+			var yAxis_bar = d3.axisLeft()
+			          .scale(yScale_bar)
+			          .ticks(8);
+
+			//Load in GeoJSON data
+			d3.json("boroughs.geojson", function(json) {
+
+				//Bind data and create one path per GeoJSON feature
+				svg.selectAll("path")
+				   .data(json.features)
+				   .enter()
+				   .append("path")
+				   .attr("d", path)
+					 .style("fill",function(d){
+						 	return color[d.properties.BoroName]
+					 });
+
+				svg.selectAll("text")
+					 .data(json.features)
+					 .enter()
+					 .append("text")
+					 .attr("x", function(d) {
+							return path.centroid(d)[0]-2*padding;
+						})
+					 .attr("y", function(d) {
+							return path.centroid(d)[1];
+						})
+					 .text(function(d) {
+							return d.properties.BoroName;
+					  })
+					 .attr("font-size",20)
+					 .attr("fill","black")
+					 .attr("stroke","white")
+					 .attr("stroke-width",0.5)
+					 .attr("font-weight","bold");
+
+					 //Load in cities data
+				 d3.csv("murder_loc.csv", function(data) {
+					 svg.selectAll("circle")
+							.data(data)
+							.enter()
+							.append("circle")
+							.attr("cx", function(d) {
+								return projection([d.Longitude, d.Latitude])[0];
+							})
+							.attr("cy", function(d) {
+								return projection([d.Longitude, d.Latitude])[1];
+							})
+							.attr("r", 3.5)
+							.attr("class","brushed")
+							.attr("text",function(d){return d.RPT_DT});
+
+					circles = svg.selectAll("circle");
+
+					nested_murders = d3.nest()
+								.key(function(d){return new Date(d.RPT_DT)})
+								.rollup(function(d){return d.length})
+								.entries(data).sort(function(a,b){
+										a = new Date(a.key);
+    								b = new Date(b.key);
+    								return a<b ? -1 : a>b ? 1 : 0;
+								})
+
+						function filter(arr, criteria) {
+							return arr.filter(function(obj) {
+								return Object.keys(criteria).every(function(c) {
+									return obj[c] == criteria[c];
+								});
+							});
+						}
+
+						var length = nested_murders.length
+
+						for (var i = 0; i < length-1; i++){
+								date1 = new Date(nested_murders[i].key);
+								date2 = new Date(nested_murders[i+1].key);
+								var timeDiff = Math.abs(date1.getTime() - date2.getTime());
+								var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+								while (diffDays > 1) {
+									var new_days = 1;
+									var x = {"key":0,"value":0};
+									x.key = date1.setDate(date1.getDate() + new_days);
+									new_days = new_days + 1;
+									diffDays = diffDays - 1;
+									nested_murders.push(x);
+								}
+						}
+
+						nested_murders.sort(function(a,b){
+											a = new Date(a.key);
+	    								b = new Date(b.key);
+	    								return a<b ? -1 : a>b ? 1 : 0;
+									})
+
+
+					var dataset = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+							for(var i = 0; i < data.length; i++){
+								dataset[parseInt(data[i].CMPLNT_FR_TM)] += 1;
+							}
+
+					xScale.domain([new Date(2006,0,1),new Date(2016,11,31)])
+								.rangeRound([padding, 2*w-padding])
+
+				  yScale.domain([0,d3.max(nested_murders,function(d){return d.value})]);
+
+					yScale_bar.domain([0,d3.max(dataset)]);
+
+					svg_bar.selectAll("rect")
+						 .data(dataset)
+						 .enter()
+						 .append("rect")
+						 .attr("x", function(d,i) {
+								 return xScale_bar(i)+padding;
+						 })
+						 .attr("y", function(d) {
+								 return yScale_bar(d) - 2*padding;
+						 })
+						 .attr("width", xScale_bar.bandwidth())
+						 .attr("height", function(d) {
+								 return h - yScale_bar(d);
+						 })
+						 .attr("fill", "teal")
+						 .attr("text",function(d){return d.CMPLNT_FR_TM});
+
+					 svg_bar.append("g")
+						 .attr("class", "y axis")
+						 .attr("transform", "translate(" + (25 + padding) + ","+(-2*padding) +")")
+						 .call(yAxis_bar)
+
+					 svg_bar.append("g")
+					   .attr("class","x axis")
+						 .attr("transform", "translate("+padding+"," + (h - 2*padding) + ")")
+						 .call(xAxis_bar)
+
+					 //Define line generator
+					 timeline = d3.line()
+								 .x(function(d) { return xScale(new Date(d.key)) + padding; })
+								 .y(function(d) { return yScale(d.value)-2*padding; });
+
+
+					 //Create line
+					 svg_line.append("path")
+						 .datum(nested_murders)
+						 .attr("class", "line")
+						 .attr("d", timeline);
+
+					 //Create axes
+					 svg_line.append("g")
+					   .attr("class","x axis")
+					 	 .attr("transform", "translate("+ padding + "," + (h_line - 2*padding) + ")")
+						 .call(xAxis);
+
+					 svg_line.append("g")
+					   .attr("class", "y axis")
+					 	 .attr("transform", "translate(" + (20+padding) + ","+(-2*padding) +")")
+						 .call(yAxis);
+
+					 function brushTimeline() {
+
+	                 if (d3.event.selection != null) {
+
+	                     // revert circles to initial style
+	                     circles.attr("class", "non_brushed");
+
+	                     var brush_coords = d3.brushSelection(this);
+
+	                     // style brushed circles
+
+	                     circles.filter(function (){
+
+	                                var date = new Date(d3.select(this).attr("text"))
+	                                return isBrushed(brush_coords, date);
+	                            })
+	                            .attr("class", "brushed");
+
+											 var d_brushed =  d3.selectAll(".brushed").data();
+											 var dataset = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+			  								for(var i = 0; i < d_brushed.length; i++){
+			  									dataset[parseInt(d_brushed[i].CMPLNT_FR_TM)] += 1;
+			  								}
+			  								yScale_bar.domain([0,d3.max(dataset)]);
+
+			  								svg_bar.selectAll("rect")
+			  						       .data(dataset)
+			  									 .transition()
+			  									 .duration(200)
+			  						       .attr("y", function(d) {
+			  						           return yScale_bar(d) - 2*padding;
+			  						       })
+			  						       .attr("height", function(d) {
+			  						           return h - yScale_bar(d);
+			  						       });
+
+			  								svg_bar.select(".y.axis")
+			  											 .transition()
+			  											 .duration(200)
+			  											 .call(yAxis_bar);
+
+	                 }
+	             }
+
+					 function animate() {
+
+						 		 var days = parseInt(input_text.value)
+                 // revert circles to initial style
+                 circles.attr("class", "non_brushed");
+
+                 // style brushed circles
+								 ini0 = new Date(2006,0,1);
+								 tmp = new Date(2006,0,1);
+								 ini1 = new Date(tmp.getTime()+days*24*3600000)
+								 brush_coords = [xScale(ini0)+padding,xScale(ini1)+padding];
+
+								 end1 = new Date(2016,11,31);
+								 tmp = new Date(2016,11,31);
+								 end0 = new Date(tmp.getTime()-days*24*3600000)
+								 brush_coords_end = [xScale(end0)+padding,xScale(end1)+padding]
+
+								 svg_line.select("#brush")
+								 				.call(brush.move,brush_coords)
+
+								 svg_line.select("#brush")
+								 				.transition()
+												.duration(10000)
+												.ease(d3.easeLinear)
+												.call(brush.move,brush_coords_end)
+	             }
+
+					 function endBrush() {
+
+                 // disregard brushes w/o selections
+                 // ref: http://bl.ocks.org/mbostock/6232537
+                 if (!d3.event.selection) return;
+
+                 // programmed clearing of brush after mouse-up
+                 // ref: https://github.com/d3/d3-brush/issues/10
+                 d3.select(this).call(brush.move, null);
+             }
+
+
+						d3.select("button").on("click",animate)
+
+
+						 var brush = d3.brushX()
+						 						.extent([[2*padding, padding],
+																[2*w,h_line-2*padding]])
+	                      .on("brush", brushTimeline);
+
+            svg_line.append("g")
+						   .attr("id","brush")
+               .call(brush);
+
+
+						function restore(){
+	 							console.log("Clicked")
+	 							circles.attr("class","brushed")
+	 							var dataset = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	 							 for(var i = 0; i < data.length; i++){
+	 								 dataset[parseInt(data[i].CMPLNT_FR_TM)] += 1;
+	 							 }
+	 							 yScale_bar.domain([0,d3.max(dataset)]);
+
+	 							 svg_bar.selectAll("rect")
+	 									.data(dataset)
+	 									.transition()
+	 									.duration(200)
+	 									.attr("y", function(d) {
+	 											return yScale_bar(d) - 2*padding;
+	 									})
+	 									.attr("height", function(d) {
+	 											return h - yScale_bar(d);
+	 									});
+
+	 							 svg_bar.select(".y.axis")
+	 											.transition()
+	 											.duration(200)
+	 											.call(yAxis_bar);
+
+	 						};
+					  svg_line.on("dblclick",restore);
+
+						svg_line.append("text")
+						.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+						.attr("transform", "translate("+ (padding/1.5) +","+(h_line/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+						.attr("font-size",14)
+						.text("# of Murders")
+						.style("font-family","sans-serif");
+
+						svg_line.append("text")
+						.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+						.attr("transform", "translate("+ (w+padding) +","+(h_line)+")")  // text is drawn off the screen top left, move down and out and rotate
+						.attr("font-size",14)
+						.text("Year")
+						.style("font-family","sans-serif");
+
+						svg_bar.append("text")
+						.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+						.attr("transform", "translate("+ (w_bar/2+padding) +","+(h-5)+")")  // text is drawn off the screen top left, move down and out and rotate
+						.attr("font-size",14)
+						.text("Hour of Day")
+						.style("font-family","sans-serif");
+
+						svg_bar.append("text")
+						.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+						.attr("transform", "translate("+ (padding/1.5) +","+(h/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+						.attr("font-size",14)
+						.text("# of Murders")
+						.style("font-family","sans-serif");
+
+				 });
+
+			});
+
+			function isBrushed(brush_coords, date) {
+
+            var date0 = new Date(xScale.invert(brush_coords[0])),
+                date1 = new Date(xScale.invert(brush_coords[1]))
+
+            return date <= date1 && date >= date0;
+        }
+
+			window.onresize = function () {location.reload();}
+
+		</script>
+	</body>
+</html>
