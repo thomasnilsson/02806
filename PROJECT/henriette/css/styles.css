@@ -1,0 +1,26 @@
+html, body {
+  background-color: white;
+  height: 100%;
+  text-align: center;
+}
+
+.plot {
+  width: 40%;
+}
+
+#containerTimeline {
+  margin: auto;
+}
+
+#containerGeo, #containerHisto {
+  /* margin: auto; */
+  display: inline-block;
+}
+
+.zip {
+  fill: red;
+}
+
+.area {
+  fill: red;
+}
