@@ -1,6 +1,6 @@
 (function () {
-	var w = 800
-	var h = 500
+	// var w = 800
+	// var h = 500
 
 	var w2 = 500
 	var h2 = 300
@@ -22,54 +22,6 @@
 		.attr("width", w2)
 		.attr("height", h2)
 
-
-	//For converting Dates to strings
-	var hourOfDay = time => {
-		var values = time.split(":")
-		return +values[0]
-	}
-
-	var parseRow = row => ({
-		"date": row.DATE,
-		"lat": parseFloat(row.LATITUDE),
-		"lon": parseFloat(row.LONGITUDE)
-	})
-
-	//Define map projection
-	// From http://bl.ocks.org/phil-pedruco/6646844
-	var projection = d3.geoMercator()
-		.center([-73.94, 40.70])
-		.translate([w / 2, h / 2])
-		.scale(45 * 1000)
-
-	//Define path generator
-	var path = d3.geoPath()
-		.projection(projection)
-
-	//Create SVG element
-	var svgGeo = d3.select("body").select("#container")
-		.append("svg")
-		.attr("width", w)
-		.attr("height", h)
-
-	let colorFunc = x => "rgb(" + x + "," + x + "," + x + ")"
-
-	//Load in GeoJSON data
-	d3.json("data/zipcodes.geojson", (error, json) => {
-		if (error) console.log("error fetching data")
-
-		// console.log(json)
-
-		//Bind data and create one path per GeoJSON feature
-		svgGeo.selectAll("path")
-			.data(json.features)
-			.enter()
-			.append("path")
-			.attr("d", path)
-			.style("fill", d => colorFunc(d.id))
-			.style("stroke", "black")
-	})
-
 	let parseHistogramRow = row => ({
 		"hour": row.hour,
 		"total_injured": +row.total_injured,
@@ -80,6 +32,14 @@
 		"cyclists_killed": +row.cyclists_killed,
 		"motorists_injured": +row.motorists_injured,
 		"motorists_killed": +row.motorists_killed
+	})
+
+	let parseRow = row => ({
+		"hour": row.hour,
+		"total": +row.total_injured + (+row.total_killed),
+		"pedestrians": +row.pedestrians_injured + (+row.pedestrians_killed),
+		"cyclists": +row.cyclists_injured + (+row.cyclists_killed),
+		"motorists": +row.motorists_injured + (+row.motorists_killed)
 	})
 
 	let draw = histogramData => {
@@ -150,7 +110,7 @@
 			.attr("transform", "rotate(-90)")
 			.style("text-anchor", "middle")
 			.attr("y", boundaries.left / 2 - 10)
-			.attr("x", -h / 4)
+			.attr("x", -h2 / 2)
 			.text("Injured")
 
 		// Text label for the X axis
@@ -158,14 +118,14 @@
 			// .attr("transform", "rotate(-90)")
 			.style("text-anchor", "middle")
 			.attr("y", boundaries.bottom + 40)
-			.attr("x", w / 3)
+			.attr("x", w2 / 2)
 			.text("Hour of the Day")
 	}
 
 	let draw2 = histogramData => {
-		let pMax = d3.max(histogramData, d => d.pedestrians_killed)
-		let cMax = d3.max(histogramData, d => d.cyclists_killed)
-		let mMax = d3.max(histogramData, d => d.motorists_killed)
+		let pMax = d3.max(histogramData, d => d.pedestrians)
+		let cMax = d3.max(histogramData, d => d.cyclists)
+		let mMax = d3.max(histogramData, d => d.motorists)
 		let yMax = d3.max([pMax, cMax, mMax])
 
 		// x Scale
@@ -189,9 +149,9 @@
 			.enter()
 			.append("rect").attr("class", "pedestrian")
 			.attr("x", d => xScale(d.hour))
-			.attr("y", d => yScale(d.motorists_killed))
+			.attr("y", d => yScale(d.motorists))
 			.attr("width", xScale.bandwidth())
-			.attr("height", d => boundaries.bottom - yScale(d.motorists_killed))
+			.attr("height", d => boundaries.bottom - yScale(d.motorists))
 			.attr("fill", "green")
 
 		svg2.selectAll(".bike")
@@ -199,9 +159,9 @@
 			.enter()
 			.append("rect").attr("class", "bike")
 			.attr("x", d => xScale(d.hour) + xScale.bandwidth() / 4)
-			.attr("y", d => yScale(d.pedestrians_killed))
+			.attr("y", d => yScale(d.pedestrians))
 			.attr("width", xScale.bandwidth() / 2)
-			.attr("height", d => boundaries.bottom - yScale(d.pedestrians_killed))
+			.attr("height", d => boundaries.bottom - yScale(d.pedestrians))
 			.attr("fill", "orange")
 
 		svg2.selectAll(".car")
@@ -209,9 +169,9 @@
 			.enter()
 			.append("rect").attr("class", "car")
 			.attr("x", d => xScale(d.hour) + (xScale.bandwidth() / 2.6))
-			.attr("y", d => yScale(d.cyclists_killed))
+			.attr("y", d => yScale(d.cyclists))
 			.attr("width", xScale.bandwidth() / 4)
-			.attr("height", d => boundaries.bottom - yScale(d.cyclists_killed))
+			.attr("height", d => boundaries.bottom - yScale(d.cyclists))
 			.attr("fill", "red")
 
 		// Make x axis with a g-element
@@ -230,22 +190,109 @@
 			.attr("transform", "rotate(-90)")
 			.style("text-anchor", "middle")
 			.attr("y", boundaries.left / 2 - 10)
-			.attr("x", -h / 4)
-			.text("Killed")
+			.attr("x", -h2 / 2)
+			.text("Injured or Killed")
 
 		// Text label for the X axis
 		svg2.append("text")
 			// .attr("transform", "rotate(-90)")
 			.style("text-anchor", "middle")
 			.attr("y", boundaries.bottom + 40)
-			.attr("x", w / 3)
+			.attr("x", w2 / 2)
 			.text("Hour of the Day")
 	}
 
-	d3.csv("data/histogram_data.csv", parseHistogramRow, histogramData => {
-		console.log(histogramData)
-		draw(histogramData)
+	
+
+	// d3.csv("data/histogram_data.csv", parseHistogramRow, histogramData => {
+	// 	console.log(histogramData)
+	// 	draw(histogramData)
+	// })
+
+	d3.csv("data/histogram_data.csv", parseRow, histogramData => {
+		console.log("histogram data: " + histogramData)
 		draw2(histogramData)
 	})
 
 })()
+
+
+// let draw2 = histogramData => {
+// 	let pMax = d3.max(histogramData, d => d.pedestrians_killed)
+// 	let cMax = d3.max(histogramData, d => d.cyclists_killed)
+// 	let mMax = d3.max(histogramData, d => d.motorists_killed)
+// 	let yMax = d3.max([pMax, cMax, mMax])
+
+// 	// x Scale
+// 	let xScale = d3.scaleBand()
+// 		.domain(histogramData.map(d => d.hour))
+// 		.rangeRound([boundaries.left, boundaries.right])
+// 		.paddingInner(innerPadding)
+
+// 	let xAxis = d3.axisBottom(xScale)
+
+// 	// y Scale
+// 	let yScale = d3.scaleLinear()
+// 		.domain([0, yMax])
+// 		.range([boundaries.bottom, boundaries.top])
+
+// 	let yAxis = d3.axisLeft(yScale).ticks(5)
+
+// 	// Bars
+// 	svg2.selectAll(".pedestrian")
+// 		.data(histogramData)
+// 		.enter()
+// 		.append("rect").attr("class", "pedestrian")
+// 		.attr("x", d => xScale(d.hour))
+// 		.attr("y", d => yScale(d.motorists_killed))
+// 		.attr("width", xScale.bandwidth())
+// 		.attr("height", d => boundaries.bottom - yScale(d.motorists_killed))
+// 		.attr("fill", "green")
+
+// 	svg2.selectAll(".bike")
+// 		.data(histogramData)
+// 		.enter()
+// 		.append("rect").attr("class", "bike")
+// 		.attr("x", d => xScale(d.hour) + xScale.bandwidth() / 4)
+// 		.attr("y", d => yScale(d.pedestrians_killed))
+// 		.attr("width", xScale.bandwidth() / 2)
+// 		.attr("height", d => boundaries.bottom - yScale(d.pedestrians_killed))
+// 		.attr("fill", "orange")
+
+// 	svg2.selectAll(".car")
+// 		.data(histogramData)
+// 		.enter()
+// 		.append("rect").attr("class", "car")
+// 		.attr("x", d => xScale(d.hour) + (xScale.bandwidth() / 2.6))
+// 		.attr("y", d => yScale(d.cyclists_killed))
+// 		.attr("width", xScale.bandwidth() / 4)
+// 		.attr("height", d => boundaries.bottom - yScale(d.cyclists_killed))
+// 		.attr("fill", "red")
+
+// 	// Make x axis with a g-element
+// 	svg2.append("g")
+// 		.attr("transform", "translate(0, " + (boundaries.bottom) + ")")
+// 		.call(xAxis)
+
+// 	// Make y axis with another g-element
+// 	svg2.append("g")
+// 		.attr("id", "yAxis")
+// 		.attr("transform", "translate(" + boundaries.left + ", 0)")
+// 		.call(yAxis)
+
+// 	// Text label for the Y axis
+// 	svg2.append("text")
+// 		.attr("transform", "rotate(-90)")
+// 		.style("text-anchor", "middle")
+// 		.attr("y", boundaries.left / 2 - 10)
+// 		.attr("x", -h2 / 2)
+// 		.text("Killed")
+
+// 	// Text label for the X axis
+// 	svg2.append("text")
+// 		// .attr("transform", "rotate(-90)")
+// 		.style("text-anchor", "middle")
+// 		.attr("y", boundaries.bottom + 40)
+// 		.attr("x", w2 / 2)
+// 		.text("Hour of the Day")
+// }
