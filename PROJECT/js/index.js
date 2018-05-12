@@ -9,13 +9,97 @@
         right: w - 20
     }
     var innerPadding = 0.1
+    
+    let LAYERED_HIST_DATA, INCIDENTS_HIST_DATA;
+    
 
     var svgAgg = d3.select("body").select("#containerHistogram")
         .append("svg")
         .attr("width", w)
         .attr("height", h)
 
-    let HIST_DATA;
+    var svgIncidents = d3.select("body").select("#incidentCountBox")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h)
+
+
+    let plotIncidentHistogram = histogramData => {
+        let yMax = d3.max(histogramData, d => d.values.length)
+        console.log("y max: " + yMax)
+        // x Scale
+        let xScale = d3.scaleBand()
+            .domain(histogramData.map(d => d.key))
+            .rangeRound([boundaries.left, boundaries.right])
+            .paddingInner(innerPadding)
+
+        let xAxis = d3.axisBottom(xScale)
+
+        // y Scale
+        let yScale = d3.scaleLinear()
+            .domain([0, yMax])
+            .range([boundaries.bottom, boundaries.top])
+
+        let yAxis = d3.axisLeft(yScale).ticks(5)
+
+        // Bars
+        svgIncidents.selectAll(".incident")
+            .data(histogramData)
+            .enter()
+            .append("rect").attr("class", "incident")
+            .attr("x", d => xScale(d.key))
+            .attr("y", d => yScale(d.values.length))
+            .attr("width", xScale.bandwidth())
+            .attr("height", d => boundaries.bottom - yScale(d.values.length))
+            .attr("fill", "steelblue")
+
+        // Make x axis with a g-element
+        svgIncidents.append("g")
+            .attr("transform", "translate(0, " + (boundaries.bottom) + ")")
+            .call(xAxis)
+
+        // Make y axis with another g-element
+        svgIncidents.append("g")
+            .attr("id", "yAxis")
+            .attr("transform", "translate(" + boundaries.left + ", 0)")
+            .call(yAxis)
+
+        // Text label for the Y axis
+        svgIncidents.append("text")
+            .attr("transform", "rotate(-90)")
+            .style("text-anchor", "middle")
+            .attr("y", boundaries.left / 2 - 10)
+            .attr("x", -h / 2)
+            .text("#Incidents")
+
+        // Text label for the X axis
+        svgIncidents.append("text")
+            // .attr("transform", "rotate(-90)")
+            .style("text-anchor", "middle")
+            .attr("y", boundaries.bottom + 40)
+            .attr("x", w / 2)
+            .text("Hour of the Day")
+    }
+
+    let incidentRowConverter = row => ({
+        "hour": row.hour,
+        "ymDate": new Date(row.date),
+        "zip_code": row.zip_code
+    })
+
+
+    d3.csv("data/individual_incidents.csv", incidentRowConverter, data => {
+        INCIDENTS_HIST_DATA = data
+
+        let nested = d3.nest()
+            .key(d => d.hour)
+            .sortKeys((a, b) => a - b)
+            .entries(data)
+
+        // console.log(nested)
+        plotIncidentHistogram(nested)
+    })
+
 
     let drawAggregateHistogram = (histogramData) => {
         let pMax = d3.max(histogramData, d => d.value.pedestrians)
@@ -111,10 +195,9 @@
     })
 
     d3.csv("data/histogram_data.csv", parseHistogramRow, data => {
-        HIST_DATA = data
-        console.log(data)
+        LAYERED_HIST_DATA = data
 
-        nested = d3.nest()
+        let nested = d3.nest()
             .key(d => d.hour)
             .sortKeys((a, b) => a - b) // Sort the hour key numerically, instead of lexicographically
             .rollup(leaves => ({
@@ -190,6 +273,7 @@
         })
 
         d3.csv("data/cleanedCollisionDataGrouped.csv", rowConverterCollisions, collisionData => {
+
             // Nest collisionData on ym summing up number of incidents - needed for timeline
             let nestData = d3.nest()
                 .key(d => d.ym)
@@ -219,7 +303,6 @@
             // Timeline y-scale
             let yMinTimeline = 0
             let yMaxTimeline = d3.max(nestData, d => d.value.ymIncidents)
-            console.log("Max y-value: " + yMaxTimeline)
             let yScaleTimeline = d3.scaleLinear()
                 .domain([yMinTimeline, yMaxTimeline])
                 .range([timelineBoundaries.bottom, timelineBoundaries.top])
@@ -326,7 +409,7 @@
                     .style("stroke", "black")
             }
 
-            let drawHist = (histogramData) => {
+            let redrawLayeredHistogram = (histogramData) => {
                 let pMax = d3.max(histogramData, d => d.value.pedestrians)
                 let cMax = d3.max(histogramData, d => d.value.cyclists)
                 let mMax = d3.max(histogramData, d => d.value.motorists)
@@ -378,7 +461,7 @@
                     .call(yAxis)
             }
 
-            let updateHistogram = () => {
+            let updateLayeredHistogram = () => {
                 if (!d3.event.selection) {
                     return
                 }
@@ -387,9 +470,8 @@
                 let startInterval = xScaleTimeline.invert(d3.event.selection[0])
                 let endInterval = xScaleTimeline.invert(d3.event.selection[1])
 
-                console.log(HIST_DATA)
                 // filter out non-selected points
-                let filteredData = HIST_DATA.filter(d => (d.ymDate >= startInterval) && (d.ymDate <= endInterval))
+                let filteredData = LAYERED_HIST_DATA.filter(d => (d.ymDate >= startInterval) && (d.ymDate <= endInterval))
 
 
                 let nested = d3.nest()
@@ -402,9 +484,62 @@
                     }))
                     .entries(filteredData)
 
+                redrawLayeredHistogram(nested)
 
-                console.log(nested)
-                drawHist(nested)
+            }
+
+            let redrawIncidentHistogram = (histogramData) => {
+                let yMax = d3.max(histogramData, d => d.values.length)
+
+                // x Scale
+                let xScale = d3.scaleBand()
+                    .domain(histogramData.map(d => d.key))
+                    .rangeRound([boundaries.left, boundaries.right])
+                    .paddingInner(innerPadding)
+
+                let xAxis = d3.axisBottom(xScale)
+
+                // y Scale
+                let yScale = d3.scaleLinear()
+                    .domain([0, yMax])
+                    .range([boundaries.bottom, boundaries.top])
+
+                let yAxis = d3.axisLeft(yScale).ticks(5)
+
+                // Bars
+                svgIncidents.selectAll(".incident")
+                    .data(histogramData)
+                    .transition()
+                    .attr("x", d => xScale(d.key))
+                    .attr("y", d => yScale(d.values.length))
+                    .attr("width", xScale.bandwidth())
+                    .attr("height", d => boundaries.bottom - yScale(d.values.length))
+
+                // Make y axis with another g-element
+                svgIncidents.select("#yAxis")
+                    .transition()
+                    .call(yAxis)
+            }
+
+            let updateIncidentHistogram = () => {
+                if (!d3.event.selection) {
+                    return
+                }
+
+                // Reverse engineer the time interval based on brush coordinates
+                let startInterval = xScaleTimeline.invert(d3.event.selection[0])
+                let endInterval = xScaleTimeline.invert(d3.event.selection[1])
+
+                // filter out non-selected points
+                let filteredData = INCIDENTS_HIST_DATA.filter(d => (d.ymDate >= startInterval) && (d.ymDate <= endInterval))
+
+                console.log(filteredData)
+                let nested = d3.nest()
+                    .key(d => d.hour)
+                    .sortKeys((a, b) => a - b)
+                    .entries(filteredData)
+
+                redrawIncidentHistogram(nested)
 
             }
 
@@ -416,7 +551,8 @@
                 ])
                 .on("end", function () {
                     updateChoropleth()
-                    updateHistogram()
+                    updateLayeredHistogram()
+                    updateIncidentHistogram()
                 })
 
 
