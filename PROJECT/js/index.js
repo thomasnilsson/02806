@@ -40,11 +40,15 @@
         console.log(d)
 
 
+        let zipCode = d.properties.postalCode
+        let poName = d.properties.PO_NAME
+        let datapoint = NESTED_CHORO_DATA.find(x => x.key == d.properties.postalCode)
+        let incidentCount = datapoint ? datapoint.value.zipIncidents : "No data"
 
         // Update the tooltip information
-        // var year = d.Year.getFullYear()
-        // d3.select("#year").text(year)
-        // d3.select("#winner").text(d.Athlete)
+        d3.select("#zipCode").text(zipCode)
+        d3.select("#incidentCount").text(incidentCount)
+        d3.select("#postalName").text(poName)
         // d3.select("#time").text(parseInt(d.Time) + " minutes")
 
         // Show the tooltip
