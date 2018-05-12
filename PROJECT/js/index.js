@@ -1,7 +1,13 @@
 (function () {
 
-    var w = 600
-    var h = 200
+    let colors = {
+        one: "#FF420E",
+        two : "#2a3132",
+        three : "#226666",
+        four : "#0D4D4D"
+    }
+    var w = 500
+    var h = 300
     var boundaries = {
         bottom: h - 60,
         top: 20,
@@ -9,9 +15,9 @@
         right: w - 20
     }
     var innerPadding = 0.1
-    
+
     let LAYERED_HIST_DATA, INCIDENTS_HIST_DATA;
-    
+
 
     var svgAgg = d3.select("body").select("#containerHistogram")
         .append("svg")
@@ -25,7 +31,7 @@
 
 
     let plotIncidentHistogram = histogramData => {
-        let yMax = d3.max(histogramData, d => d.values.length)
+        let yMax = d3.max(histogramData, d => d.value.count)
         console.log("y max: " + yMax)
         // x Scale
         let xScale = d3.scaleBand()
@@ -48,10 +54,10 @@
             .enter()
             .append("rect").attr("class", "incident")
             .attr("x", d => xScale(d.key))
-            .attr("y", d => yScale(d.values.length))
+            .attr("y", d => yScale(d.value.count))
             .attr("width", xScale.bandwidth())
-            .attr("height", d => boundaries.bottom - yScale(d.values.length))
-            .attr("fill", "steelblue")
+            .attr("height", d => boundaries.bottom - yScale(d.value.count))
+            .attr("fill", colors.four)
 
         // Make x axis with a g-element
         svgIncidents.append("g")
@@ -83,20 +89,24 @@
 
     let incidentRowConverter = row => ({
         "hour": row.hour,
-        "ymDate": new Date(row.date),
-        "zip_code": row.zip_code
+        "ymDate": new Date(row.ym),
+        "count": +row.count
     })
 
 
-    d3.csv("data/individual_incidents.csv", incidentRowConverter, data => {
+    d3.csv("data/hist_incident_count.csv", incidentRowConverter, data => {
         INCIDENTS_HIST_DATA = data
 
         let nested = d3.nest()
             .key(d => d.hour)
             .sortKeys((a, b) => a - b)
+            .rollup(leaves => ({
+                "count": d3.sum(leaves, d => d.count)
+            }))
             .entries(data)
 
-        // console.log(nested)
+
+        console.log(nested)
         plotIncidentHistogram(nested)
     })
 
@@ -131,7 +141,7 @@
             .attr("y", d => yScale(d.value.motorists))
             .attr("width", xScale.bandwidth())
             .attr("height", d => boundaries.bottom - yScale(d.value.motorists))
-            .attr("fill", "green")
+            .attr("fill", colors.three)
 
         svgAgg.selectAll(".pedestrian")
             .data(histogramData)
@@ -141,7 +151,7 @@
             .attr("y", d => yScale(d.value.pedestrians))
             .attr("width", xScale.bandwidth() / 2)
             .attr("height", d => boundaries.bottom - yScale(d.value.pedestrians))
-            .attr("fill", "orange")
+            .attr("fill", colors.four)
 
         svgAgg.selectAll(".bike")
             .data(histogramData)
@@ -151,7 +161,7 @@
             .attr("y", d => yScale(d.value.cyclists))
             .attr("width", xScale.bandwidth() / 4)
             .attr("height", d => boundaries.bottom - yScale(d.value.cyclists))
-            .attr("fill", "red")
+            .attr("fill", colors.one)
 
         // Make x axis with a g-element
         svgAgg.append("g")
@@ -214,12 +224,12 @@
 
 
     // _____________CHOROPLETH________________
-    let choroWidth = 700
-    let choroHeight = 700
+    let choroWidth = 600
+    let choroHeight = 600
 
     //GENERAL VARIABLE INITIALIZATION
-    let timelineWidth = 600
-    let timelineHeight = 200
+    let timelineWidth = 1000
+    let timelineHeight = 150
     let timelineBoundaries = {
         bottom: timelineHeight - 60,
         top: 20,
@@ -307,6 +317,7 @@
                 .domain([yMinTimeline, yMaxTimeline])
                 .range([timelineBoundaries.bottom, timelineBoundaries.top])
 
+
             // Draw timeline
             let area = d3.area()
                 .x(d => xScaleTimeline(new Date(20 + d.key.slice(0, 2), parseInt(d.key.slice(2, 4)) - 1)))
@@ -316,7 +327,7 @@
             let timelinePath = svgTimeline.append("path")
                 .datum(nestData)
                 .attr("class", "area")
-                .attr("fill", "#A00")
+                .attr("fill", colors.one)
                 .attr("d", area)
 
             //Timeline axes
@@ -329,7 +340,7 @@
                 .attr("class", "axis")
                 .call(xAxis)
 
-            let yAxis = d3.axisLeft()
+            let yAxis = d3.axisLeft().ticks(3)  
 
             yAxis.scale(yScaleTimeline)
 
@@ -351,7 +362,7 @@
                 // Color scale for coloring zip codes
                 let colorScaleInit = d3.scaleLinear()
                     .domain([0, yMaxTimeline])
-                    .range(['white', '#A00'])
+                    .range(['white', colors.one])
 
                 // set styling of zip codes
                 paths.style("fill", (d, i) => {
@@ -394,7 +405,7 @@
 
                 let colorScale = d3.scaleLinear()
                     .domain([0, choroMax])
-                    .range(['white', '#A00'])
+                    .range(['white', colors.one])
 
                 // Update choropleth colors
                 paths.style("fill", (d, i) => {
@@ -489,7 +500,7 @@
             }
 
             let redrawIncidentHistogram = (histogramData) => {
-                let yMax = d3.max(histogramData, d => d.values.length)
+                let yMax = d3.max(histogramData, d => d.value.count)
 
                 // x Scale
                 let xScale = d3.scaleBand()
@@ -511,9 +522,9 @@
                     .data(histogramData)
                     .transition()
                     .attr("x", d => xScale(d.key))
-                    .attr("y", d => yScale(d.values.length))
+                    .attr("y", d => yScale(d.value.count))
                     .attr("width", xScale.bandwidth())
-                    .attr("height", d => boundaries.bottom - yScale(d.values.length))
+                    .attr("height", d => boundaries.bottom - yScale(d.value.count))
 
                 // Make y axis with another g-element
                 svgIncidents.select("#yAxis")
@@ -533,11 +544,15 @@
                 // filter out non-selected points
                 let filteredData = INCIDENTS_HIST_DATA.filter(d => (d.ymDate >= startInterval) && (d.ymDate <= endInterval))
 
-                console.log(filteredData)
+                // console.log(filteredData)
                 let nested = d3.nest()
                     .key(d => d.hour)
                     .sortKeys((a, b) => a - b)
+                    .rollup(leaves => ({
+                        "count": d3.sum(leaves, d => d.count)
+                    }))
                     .entries(filteredData)
+
 
                 redrawIncidentHistogram(nested)
 
