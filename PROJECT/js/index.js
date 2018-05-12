@@ -1,10 +1,9 @@
 (function () {
 
     let colors = {
-        one: "#FF420E",
-        two : "#2a3132",
-        three : "#226666",
-        four : "#0D4D4D"
+        one: "#77FFFF",
+        two: "#0DAAAA",
+        three: "#0D4D4D"
     }
     var w = 500
     var h = 300
@@ -16,8 +15,8 @@
     }
     var innerPadding = 0.1
 
-    let LAYERED_HIST_DATA, INCIDENTS_HIST_DATA;
-
+    let LAYERED_HIST_DATA, INCIDENTS_HIST_DATA, CHORO_COLOR_SCALE, NESTED_CHORO_DATA;
+    let tooltip = d3.select("#tooltipChoropleth").classed("hidden", true)
 
     var svgAgg = d3.select("body").select("#containerHistogram")
         .append("svg")
@@ -29,6 +28,39 @@
         .attr("width", w)
         .attr("height", h)
 
+
+    var handleMouseOver = (element, d) => {
+        // Use mouse coordinates for tooltip position
+        var xPos = d3.event.pageX
+        var yPos = d3.event.pageY
+
+        //Update the tooltip position
+        tooltip.style("left", xPos + "px").style("top", yPos + "px")
+
+        console.log(d)
+
+
+
+        // Update the tooltip information
+        // var year = d.Year.getFullYear()
+        // d3.select("#year").text(year)
+        // d3.select("#winner").text(d.Athlete)
+        // d3.select("#time").text(parseInt(d.Time) + " minutes")
+
+        // Show the tooltip
+        tooltip.classed("hidden", false)
+
+        // Highlight the current element
+        d3.select(element).style("stroke-width", "4")
+    }
+
+    var handleMouseOut = element => {
+        //Hide the tooltip again
+        tooltip.classed("hidden", true)
+
+        // Remove highlight from the element
+        d3.select(element).style("stroke-width", "1")
+    }
 
     let plotIncidentHistogram = histogramData => {
         let yMax = d3.max(histogramData, d => d.value.count)
@@ -57,7 +89,7 @@
             .attr("y", d => yScale(d.value.count))
             .attr("width", xScale.bandwidth())
             .attr("height", d => boundaries.bottom - yScale(d.value.count))
-            .attr("fill", colors.four)
+            .attr("fill", colors.three)
 
         // Make x axis with a g-element
         svgIncidents.append("g")
@@ -151,7 +183,7 @@
             .attr("y", d => yScale(d.value.pedestrians))
             .attr("width", xScale.bandwidth() / 2)
             .attr("height", d => boundaries.bottom - yScale(d.value.pedestrians))
-            .attr("fill", colors.four)
+            .attr("fill", colors.two)
 
         svgAgg.selectAll(".bike")
             .data(histogramData)
@@ -294,10 +326,10 @@
                 .entries(collisionData)
 
             // Nest collisionData on zip code summing up number of incidents - needed for choropleth coloring
-            let nestDataZip = d3.nest()
+            NESTED_CHORO_DATA = d3.nest()
                 .key(d => d.zip)
                 .rollup(leaves => ({
-                    "zipIncidentsInit": d3.sum(leaves, d => d.incidentCount)
+                    "zipIncidents": d3.sum(leaves, d => d.incidentCount)
                 }))
                 .entries(collisionData)
 
@@ -327,7 +359,7 @@
             let timelinePath = svgTimeline.append("path")
                 .datum(nestData)
                 .attr("class", "area")
-                .attr("fill", colors.one)
+                .attr("fill", colors.three)
                 .attr("d", area)
 
             //Timeline axes
@@ -340,7 +372,7 @@
                 .attr("class", "axis")
                 .call(xAxis)
 
-            let yAxis = d3.axisLeft().ticks(3)  
+            let yAxis = d3.axisLeft().ticks(3)
 
             yAxis.scale(yScaleTimeline)
 
@@ -357,23 +389,23 @@
                 .enter()
                 .append("path")
                 .attr("d", path)
+                .on("mouseover", function (d) {
+                    handleMouseOver(this, d)
+                })
+                .on("mouseout", function () {
+                    handleMouseOut(this)
+                })
 
             let initChoropleth = () => {
                 // Color scale for coloring zip codes
-                let colorScaleInit = d3.scaleLinear()
+                CHORO_COLOR_SCALE = d3.scaleLinear()
                     .domain([0, yMaxTimeline])
-                    .range(['white', colors.one])
+                    .range(['white', colors.three])
 
                 // set styling of zip codes
                 paths.style("fill", (d, i) => {
-                        // If statement handles zip codes that are not present in nestDatachoro - find a better solution
-                        if (nestDataZip.find(x => x.key == d.properties.postalCode)) {
-                            // Cross link zip code in geoJSON file with zip codes in the filtered data and get number of incidents
-                            let incidents = nestDataZip
-                                .find(x => x.key == d.properties.postalCode)
-                                .value.zipIncidentsInit
-                            return colorScaleInit(incidents)
-                        }
+                        let datapoint = NESTED_CHORO_DATA.find(x => x.key == d.properties.postalCode)
+                        return datapoint ? CHORO_COLOR_SCALE(datapoint.value.zipIncidents) : "white"
                     })
                     .style("stroke", "black")
             }
@@ -393,7 +425,7 @@
                 let tempDataChoro = collisionData.filter(d => (d.ymDate >= startInterval) && (d.ymDate <= endInterval))
 
                 // Nest tempDataChoro on zip code
-                let nestDataChoro = d3.nest()
+                NESTED_CHORO_DATA = d3.nest()
                     .key(d => d.zip)
                     .rollup(leaves => ({
                         "zipIncidents": d3.sum(leaves, d => d.incidentCount)
@@ -401,21 +433,14 @@
                     .entries(tempDataChoro)
 
                 // Dynamic color scale
-                let choroMax = d3.max(nestDataChoro, d => d.value.zipIncidents)
+                let choroMax = d3.max(NESTED_CHORO_DATA, d => d.value.zipIncidents)
 
-                let colorScale = d3.scaleLinear()
-                    .domain([0, choroMax])
-                    .range(['white', colors.one])
+                CHORO_COLOR_SCALE.domain([0, choroMax])
 
                 // Update choropleth colors
                 paths.style("fill", (d, i) => {
-                        if (nestDataChoro.find(x => x.key == d.properties.postalCode)) {
-                            // Cross link zip code in geoJSON file with zip codes in the filtered data and get number of incidents
-                            let incidents = nestDataChoro
-                                .find(x => x.key == d.properties.postalCode)
-                                .value.zipIncidents
-                            return colorScale(incidents)
-                        }
+                        let datapoint = NESTED_CHORO_DATA.find(x => x.key == d.properties.postalCode)
+                        return datapoint ? CHORO_COLOR_SCALE(datapoint.value.zipIncidents) : "white"
                     })
                     .style("stroke", "black")
             }

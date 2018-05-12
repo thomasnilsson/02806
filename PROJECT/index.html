@@ -18,7 +18,12 @@
 	</article>
 	<div align="center">
 		<div id="containerTimeline"></div>
-	<div id="containerGeo" style="display:inline-block;"></div>
+	<div id="containerGeo" style="display:inline-block;">
+		<div class="tooltip" id="tooltipChoropleth" class="hidden">
+			<strong><p><span id="month"/></strong></p>
+				<p>Types: <span id="count"/></p>
+		</div>
+	</div>
 	<div style="display:inline-block;">
 		<div id="containerHistogram"></div>
 		<div id="incidentCountBox"></div>
@@ -35,6 +40,5 @@
 
 </body>
 <script src="js/index.js"></script>
-<!-- <script src="js/collisions.js"></script> -->
 
 </html>
