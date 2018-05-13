@@ -31,6 +31,7 @@
     let LAYERED_HIST_DATA, INCIDENTS_HIST_DATA, CHORO_COLOR_SCALE, NESTED_CHORO_DATA;
     let tooltipChoropleth = d3.select("#tooltipChoropleth").classed("hidden", true)
     let tooltipInjured = d3.select("#tooltipInjured").classed("hidden", true)
+    let tooltipIncident = d3.select("#tooltipIncident").classed("hidden", true)
 
     let setPeriod = (start, end) => {
         let period = start.toISOString().substring(0, 10) + " to " + end.toISOString().substring(0, 10)
@@ -79,6 +80,8 @@
         tooltipInjured.style("left", xPos + "px").style("top", yPos + "px").classed("hidden", false)
 
         // Update the tooltipChoropleth information
+        let timeInterval = d.key + "-" + (+d.key+1)
+        d3.select("#hourOfDayInjured").text(timeInterval)
         d3.select("#motorists").text(d.value.motorists)
         d3.select("#pedestrians").text(d.value.pedestrians)
         d3.select("#cyclists").text(d.value.cyclists)
@@ -100,6 +103,26 @@
             color = colors.one
         }
         d3.select(element).attr("fill", color)
+    }
+
+    let mouseOverIncidentHistogram = (element, d) => {
+        let xPos = d3.event.pageX
+        let yPos = d3.event.pageY
+
+        //Update the tooltipChoropleth position
+        tooltipIncident.style("left", xPos + "px").style("top", yPos + "px").classed("hidden", false)
+        
+        // Update the tooltipChoropleth information
+        let timeInterval = d.key + "-" + (+d.key+1)
+        d3.select("#hourOfDayIncident").text(timeInterval)
+        d3.select("#incidents").text(d.value.count)
+
+        d3.select(element).attr("fill", "orange")
+    }
+
+    let mouseOutIncidentHistogram = element => {
+        tooltipIncident.classed("hidden", true)
+        d3.select(element).attr("fill", colors.three)
     }
 
     let histogramInjured = d3.select("body").select("#containerHistogram")
@@ -213,6 +236,12 @@
             .attr("width", xScale.bandwidth())
             .attr("height", d => boundaries.bottom - yScale(d.value.count))
             .attr("fill", colors.three)
+            .on("mouseover", function (d) {
+                mouseOverIncidentHistogram(this, d)
+            })
+            .on("mouseout", function () {
+                mouseOutIncidentHistogram(this)
+            })
 
         // Make x axis with a g-element
         histogramIncidents.append("g")

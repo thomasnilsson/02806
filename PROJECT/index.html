@@ -4,7 +4,8 @@
 <head>
 	<meta charset="utf-8">
 	<title>NYC Motor Vehicle Collisions</title>
-	<link rel="shortcut icon" href=""> <!-- Prevents stupid favicon error in JS Console -->
+	<link rel="shortcut icon" href="">
+	<!-- Prevents stupid favicon error in JS Console -->
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/custom.css">
@@ -19,7 +20,9 @@
 	</article>
 	<div align="center">
 		<h3>Selected Period:
-			<i><span id="period" /></i>
+			<i>
+				<span id="period" />
+			</i>
 		</h3>
 		<h5>(Brush the timeline to select a period)</h5>
 
@@ -44,6 +47,10 @@
 			<div id="containerHistogram"></div>
 			<div class="tooltip" id="tooltipInjured" class="hidden">
 				<strong>
+					<p>Time of Day
+						<span id="hourOfDayInjured" />
+				</strong>
+				<strong>
 					<p>Motorists:
 						<span id="motorists" />
 				</strong>
@@ -55,9 +62,21 @@
 					<p>Cyclists:
 						<span id="cyclists" />
 				</strong>
+				
 				</p>
 			</div>
 			<div id="incidentCountBox"></div>
+			<div class="tooltip" id="tooltipIncident" class="hidden">
+				<strong>
+					<p>Time of Day
+						<span id="hourOfDayIncident" />
+				</strong>
+				<strong>
+					<p>Incidents:
+						<span id="incidents" />
+				</strong>
+				</p>
+			</div>
 		</div>
 		<div id="factorsBox"></div>
 	</div>
