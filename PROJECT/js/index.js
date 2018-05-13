@@ -71,6 +71,37 @@
         d3.select(element).style("stroke-width", "1")
     }
 
+    let mouseOverInjuredHistogram = (element, d) => {
+        let xPos = d3.event.pageX
+        let yPos = d3.event.pageY
+
+        //Update the tooltipChoropleth position
+        tooltipInjured.style("left", xPos + "px").style("top", yPos + "px").classed("hidden", false)
+
+        // Update the tooltipChoropleth information
+        d3.select("#motorists").text(d.value.motorists)
+        d3.select("#pedestrians").text(d.value.pedestrians)
+        d3.select("#cyclists").text(d.value.cyclists)
+
+        d3.select(element).attr("fill", "orange")
+    }
+
+    let mouseOutInjuredHistogram = element => {
+        tooltipInjured.classed("hidden", true)
+        let type = d3.select(element).attr("class")
+        let color;
+        if (type == "motorist"){
+            color = colors.three
+        }
+        else if (type == "pedestrian"){
+            color = colors.two
+        }
+        else if (type == "cyclist"){
+            color = colors.one
+        }
+        d3.select(element).attr("fill", color)
+    }
+
     let histogramInjured = d3.select("body").select("#containerHistogram")
         .append("svg")
         .attr("width", w)
@@ -249,6 +280,12 @@
             .attr("width", xScale.bandwidth())
             .attr("height", d => boundaries.bottom - yScale(d.value.motorists))
             .attr("fill", colors.three)
+            .on("mouseover", function (d) {
+                mouseOverInjuredHistogram(this, d)
+            })
+            .on("mouseout", function () {
+                mouseOutInjuredHistogram(this)
+            })
 
         histogramInjured.selectAll(".pedestrian")
             .data(histogramData)
@@ -259,6 +296,12 @@
             .attr("width", xScale.bandwidth() / 2)
             .attr("height", d => boundaries.bottom - yScale(d.value.pedestrians))
             .attr("fill", colors.two)
+            .on("mouseover", function (d) {
+                mouseOverInjuredHistogram(this, d)
+            })
+            .on("mouseout", function () {
+                mouseOutInjuredHistogram(this)
+            })
 
         histogramInjured.selectAll(".cyclist")
             .data(histogramData)
@@ -269,6 +312,12 @@
             .attr("width", xScale.bandwidth() / 4)
             .attr("height", d => boundaries.bottom - yScale(d.value.cyclists))
             .attr("fill", colors.one)
+            .on("mouseover", function (d) {
+                mouseOverInjuredHistogram(this, d)
+            })
+            .on("mouseout", function () {
+                mouseOutInjuredHistogram(this)
+            })
 
         // Make x axis with a g-element
         histogramInjured.append("g")
