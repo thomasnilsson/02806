@@ -19,6 +19,12 @@
     let LAYERED_HIST_DATA, INCIDENTS_HIST_DATA, CHORO_COLOR_SCALE, NESTED_CHORO_DATA;
     let tooltip = d3.select("#tooltipChoropleth").classed("hidden", true)
 
+    let setPeriod = (start, end) => {
+        let period = start.toISOString().substring(0, 10) + " to " + end.toISOString().substring(0, 10)
+        d3.select("body").select("#period")
+            .text(period)
+    }
+
     var svgAgg = d3.select("body").select("#containerHistogram")
         .append("svg")
         .attr("width", w)
@@ -287,10 +293,10 @@
             .attr("height", d => boundaries.bottom - yScale(d.value.pedestrians))
             .attr("fill", colors.two)
 
-        svgAgg.selectAll(".bike")
+        svgAgg.selectAll(".cyclist")
             .data(histogramData)
             .enter()
-            .append("rect").attr("class", "bike")
+            .append("rect").attr("class", "cyclist")
             .attr("x", d => xScale(d.key) + (xScale.bandwidth() / 2.6))
             .attr("y", d => yScale(d.value.cyclists))
             .attr("width", xScale.bandwidth() / 4)
@@ -358,6 +364,33 @@
             .attr("width", rectSize)
             .attr("height", rectSize)
             .attr("fill", d => d.color)
+            .on("mouseover", function (d) {
+                let selector = "none"
+
+                if (d.title == "Pedestrians") {
+                    selector = ".pedestrian"
+                } else if (d.title == "Cyclists") {
+                    selector = ".cyclist"
+                } else if (d.title == "Motorists") {
+                    selector = ".motorist"
+                }
+                svgAgg.selectAll(selector)
+                    .attr("fill", "orange")
+
+            })
+            .on("mouseout", function (d) {
+                if (d.title == "Pedestrians") {
+                    svgAgg.selectAll(".pedestrian")
+                        .attr("fill", colors.two)
+                } else if (d.title == "Motorists") {
+                    svgAgg.selectAll(".motorist")
+                        .attr("fill", colors.three)
+                } else if (d.title == "Cyclists") {
+                    svgAgg.selectAll(".cyclist")
+                        .attr("fill", colors.one)
+                }
+
+            })
 
         legend.append("text")
             .attr("x", boundaries.right + 80)
@@ -490,10 +523,13 @@
             // Timeline x-scale
             let xMinTimeline = d3.min(collisionData, d => d.ymDate) //Perhaps compute in advance?
             let xMaxTimeline = d3.max(collisionData, d => d.ymDate) //Perhaps compute in advance?
+            
+            setPeriod(xMinTimeline, xMaxTimeline)
+
             let xScaleTimeline = d3.scaleTime()
                 .domain([xMinTimeline, xMaxTimeline])
                 .range([timelineBoundaries.left, timelineBoundaries.right])
-
+            
             // Timeline y-scale
             let yMinTimeline = 0
             let yMaxTimeline = d3.max(nestData, d => d.value.ymIncidents)
@@ -575,6 +611,7 @@
                 let startInterval = xScaleTimeline.invert(d3.event.selection[0])
                 let endInterval = xScaleTimeline.invert(d3.event.selection[1])
 
+                setPeriod(startInterval, endInterval)
                 // Get collisionData in selected time interval
                 let tempDataChoro = collisionData.filter(d => (d.ymDate >= startInterval) && (d.ymDate <= endInterval))
 
@@ -637,7 +674,7 @@
                     .attr("width", xScale.bandwidth() / 2)
                     .attr("height", d => boundaries.bottom - yScale(d.value.pedestrians))
 
-                svgAgg.selectAll(".bike")
+                svgAgg.selectAll(".cyclist")
                     .data(histogramData)
                     .transition()
                     .attr("x", d => xScale(d.key) + (xScale.bandwidth() / 2.6))
