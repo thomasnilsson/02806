@@ -5,13 +5,13 @@
         two: "#0DAAAA",
         three: "#0D4D4D"
     }
-    var w = 500
+    var w = 700
     var h = 300
     var boundaries = {
         bottom: h - 60,
         top: 20,
         left: 60,
-        right: w - 20
+        right: w - 150
     }
     var innerPadding = 0.1
 
@@ -36,33 +36,33 @@
 
     let makeFactorsHistogram = () => {
         let factorsData = [{
-                "key": "ailments",
+                "key": "Ailments",
                 "value": 85409
             },
             {
-                "key": "bad_driving",
+                "key": "Bad Driving",
                 "value": 192014
             },
             {
-                "key": "car_defects",
+                "key": "Car Defects",
                 "value": 56605
             },
             {
-                "key": "distraction",
+                "key": "Distractions",
                 "value": 176373
             },
             {
-                "key": "outside_influence",
+                "key": "Outside Influence",
                 "value": 18424
             },
             {
-                "key": "under_influence",
+                "key": "Driving Under Influence",
                 "value": 9092
             }
         ]
 
         let yMax = d3.max(factorsData, d => d.value)
-        console.log("y max: " + yMax)
+
         // x Scale
         let xScale = d3.scaleBand()
             .domain(factorsData.map(d => d.key))
@@ -106,7 +106,7 @@
             .style("text-anchor", "middle")
             .attr("y", boundaries.left / 2 - 10)
             .attr("x", -h / 2)
-            .text("#Incidents")
+            .text("Incidents (2012-2018)")
 
         // Text label for the X axis
         svgFactors.append("text")
@@ -114,7 +114,7 @@
             .style("text-anchor", "middle")
             .attr("y", boundaries.bottom + 40)
             .attr("x", w / 2)
-            .text("Hour of the Day")
+            .text("Cause")
     }
 
     makeFactorsHistogram()
@@ -315,6 +315,48 @@
             .attr("y", boundaries.bottom + 40)
             .attr("x", w / 2)
             .text("Hour of the Day")
+
+        let rectSize = 20
+
+
+        let legendInfo = [{
+                title: "Motorists",
+                color: colors.three
+            },
+
+            {
+                title: "Pedestrians",
+                color: colors.two
+            },
+            {
+                title: "Cyclists",
+                color: colors.one
+            },
+        ]
+
+        var legend = svgAgg.append("g")
+            .attr("transform", (d, i) => ("translate(0," + 0.2 * h + ")"))
+            .attr("font-family", "sans-serif")
+            .attr("font-size", 14)
+            .attr("text-anchor", "end")
+            .selectAll("g")
+            .data(legendInfo)
+            .enter()
+            .append("g")
+            .attr("transform", (d, i) => ("translate(" + 0 + "," + i * 1.05 * rectSize + ")"))
+
+        legend.append("rect")
+            .attr("x", boundaries.right + 90)
+            .attr("width", rectSize)
+            .attr("height", rectSize)
+            .attr("fill", d => d.color)
+
+        legend.append("text")
+            .attr("x", boundaries.right + 80)
+            .style("text-anchor", "end")
+            .attr("y", rectSize / 2)
+            .attr("dy", "0.32em")
+            .text(d => d.title)
     }
 
     let parseHistogramRow = row => ({
