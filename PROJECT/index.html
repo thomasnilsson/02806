@@ -25,10 +25,15 @@
 			</i>
 		</h3>
 		<h5>(Brush the timeline to select a period)</h5>
+		<a href="https://raw.githubusercontent.com/thomasnilsson/02806/master/PROJECT/data/data_timeline.csv?token=AJB0p0dGeLoR1NNrZlPG_panW2tC6-6Dks5bAe-gwA%3D%3D">Download Timeline Dataset</a>
+		<br><a href="https://raw.githubusercontent.com/thomasnilsson/02806/master/PROJECT/data/zipcodes.geojson?token=AJB0p01QOVur6zKClay8ilkzd42TdAc5ks5bAe-jwA%3D%3D">Download GeoJSON Dataset</a>		
+		<!-- TIMELINE PLOT -->
+		<div id="containerTimeline">
+		</div>
 
-		<div id="containerTimeline"></div>
-
+		<!-- CHOROPLETH GEOJSON PLOT -->		
 		<div id="containerGeo" style="display:inline-block;">
+			<!-- TOOLTIP: CHOROPLETH -->
 			<div class="tooltip" id="tooltipChoropleth" class="hidden">
 				<strong>
 					<p>Incidents:
@@ -43,8 +48,17 @@
 				</p>
 			</div>
 		</div>
+
+
+		<!-- HISTOGRAMS -->
 		<div style="display:inline-block;">
+
+			<!-- HISTOGRAM: INJURED/KILLED -->
+			<a href="https://raw.githubusercontent.com/thomasnilsson/02806/master/PROJECT/data/data_injured_histogram.csv?token=AJB0p-ApdKqx5NvYY88GCSfp9CI_y0n1ks5bAfAYwA%3D%3D">Download Injured/Killed Dataset</a>
+
 			<div id="containerHistogram"></div>
+
+			<!-- TOOLTIP: INJURED/KILLED -->
 			<div class="tooltip" id="tooltipInjured" class="hidden">
 				<strong>
 					<p>Time of Day
@@ -62,10 +76,14 @@
 					<p>Cyclists:
 						<span id="cyclists" />
 				</strong>
-				
+
 				</p>
 			</div>
+
+			<!-- HISTOGRAM: INCIDENT COUNTS -->
+			<a href="https://raw.githubusercontent.com/thomasnilsson/02806/master/PROJECT/data/data_incident_histogram.csv?token=AJB0p3ncGtLRBog5KwLENZtkt9Yp-Ndnks5bAe-KwA%3D%3D">Download Incident Dataset</a>
 			<div id="incidentCountBox"></div>
+			<!-- TOOLTIP: INCIDENT COUNTS -->
 			<div class="tooltip" id="tooltipIncident" class="hidden">
 				<strong>
 					<p>Time of Day
@@ -78,7 +96,10 @@
 				</p>
 			</div>
 		</div>
+		<!-- HISTOGRAM: CONTRIBUTING FACTORS -->
 		<div id="factorsBox"></div>
+		<a href="https://raw.githubusercontent.com/thomasnilsson/02806/master/PROJECT/data/data_factors.json?token=AJB0pwrPtfo_GIBkZrx3BOd8uU4QBqAZks5bAe6CwA%3D%3D">Download Causes Dataset</a>
+
 	</div>
 	</div>
 	</div>
