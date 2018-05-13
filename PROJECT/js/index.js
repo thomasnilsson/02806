@@ -5,19 +5,32 @@
         two: "#0DAAAA",
         three: "#0D4D4D"
     }
-    var w = 700
-    var h = 300
-    var boundaries = {
+    let w = 700
+    let h = 300
+    let boundaries = {
         bottom: h - 90,
         top: 40,
         left: 60,
         right: w - 150
     }
-    var innerPadding = 0.1
+    let innerPadding = 0.1
 
+    let choroWidth = 600
+    let choroHeight = 600
+
+    //GENERAL VARIABLE INITIALIZATION
+    let timelineWidth = 1000
+    let timelineHeight = 150
+    let timelineBoundaries = {
+        bottom: timelineHeight - 60,
+        top: 20,
+        left: 60,
+        right: timelineWidth - 20
+    }
 
     let LAYERED_HIST_DATA, INCIDENTS_HIST_DATA, CHORO_COLOR_SCALE, NESTED_CHORO_DATA;
-    let tooltip = d3.select("#tooltipChoropleth").classed("hidden", true)
+    let tooltipChoropleth = d3.select("#tooltipChoropleth").classed("hidden", true)
+    let tooltipInjured = d3.select("#tooltipInjured").classed("hidden", true)
 
     let setPeriod = (start, end) => {
         let period = start.toISOString().substring(0, 10) + " to " + end.toISOString().substring(0, 10)
@@ -25,48 +38,65 @@
             .text(period)
     }
 
-    var svgAgg = d3.select("body").select("#containerHistogram")
+    let mouseOverChoro = (element, d) => {
+        // Use mouse coordinates for tooltipChoropleth position
+        let xPos = d3.event.pageX
+        let yPos = d3.event.pageY
+
+        //Update the tooltipChoropleth position
+        tooltipChoropleth.style("left", xPos + "px").style("top", yPos + "px")
+
+        let zipCode = d.properties.postalCode
+        let borough = d.properties.borough
+        let datapoint = NESTED_CHORO_DATA.find(x => x.key == d.properties.postalCode)
+        let incidentCount = datapoint ? datapoint.value.zipIncidents : "No data"
+
+        // Update the tooltipChoropleth information
+        d3.select("#zipCode").text(zipCode)
+        d3.select("#incidentCount").text(incidentCount)
+        d3.select("#borough").text(borough)
+
+        // Show the tooltipChoropleth
+        tooltipChoropleth.classed("hidden", false)
+
+        // Highlight the current element
+        d3.select(element).style("stroke-width", "4")
+    }
+
+    let mouseOutChoro = element => {
+        //Hide the tooltipChoropleth again
+        tooltipChoropleth.classed("hidden", true)
+
+        // Remove highlight from the element
+        d3.select(element).style("stroke-width", "1")
+    }
+
+    let histogramInjured = d3.select("body").select("#containerHistogram")
         .append("svg")
         .attr("width", w)
         .attr("height", h)
 
-    var svgIncidents = d3.select("body").select("#incidentCountBox")
+    let histogramIncidents = d3.select("body").select("#incidentCountBox")
         .append("svg")
         .attr("width", w)
         .attr("height", h)
 
-    var svgFactors = d3.select("body").select("#factorsBox")
+    let histogramFactors = d3.select("body").select("#factorsBox")
         .append("svg")
         .attr("width", w)
         .attr("height", h)
 
-    let makeFactorsHistogram = () => {
-        let factorsData = [{
-                "key": "Ailments",
-                "value": 85409
-            },
-            {
-                "key": "Bad Driving",
-                "value": 192014
-            },
-            {
-                "key": "Car Defects",
-                "value": 56605
-            },
-            {
-                "key": "Distractions",
-                "value": 176373
-            },
-            {
-                "key": "Outside Influence",
-                "value": 18424
-            },
-            {
-                "key": "Under Influence",
-                "value": 9092
-            }
-        ]
+    let svgTimeline = d3.select("#containerTimeline")
+        .append("svg")
+        .attr("width", timelineWidth)
+        .attr("height", timelineHeight)
 
+    let svgGeo = d3.select("#containerGeo")
+        .append("svg")
+        .attr("width", choroWidth)
+        .attr("height", choroHeight)
+
+    let makeFactorsHistogram = (factorsData) => {
         let yMax = d3.max(factorsData, d => d.value)
 
         // x Scale
@@ -85,7 +115,7 @@
         let yAxis = d3.axisLeft(yScale).ticks(5)
 
         // Bars
-        svgFactors.selectAll(".factor")
+        histogramFactors.selectAll(".factor")
             .data(factorsData)
             .enter()
             .append("rect").attr("class", "factor")
@@ -96,21 +126,19 @@
             .attr("fill", colors.two)
 
         // Make x axis with a g-element
-        svgFactors.append("g")
+        histogramFactors.append("g")
             .attr("transform", "translate(0, " + (boundaries.bottom) + ")")
             .call(xAxis)
             .selectAll("text")
 
         // Make y axis with another g-element
-        svgFactors.append("g")
+        histogramFactors.append("g")
             .attr("id", "yAxis")
             .attr("transform", "translate(" + boundaries.left + ", 0)")
             .call(yAxis)
 
-
-
         // Text label for the Y axis
-        svgFactors.append("text")
+        histogramFactors.append("text")
             .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
             .attr("y", boundaries.left / 2 - 20)
@@ -118,49 +146,12 @@
             .text("Incidents (2012-2018)")
 
         // Text label for the X axis
-        svgFactors.append("text")
+        histogramFactors.append("text")
             // .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
             .attr("y", boundaries.top - 20)
             .attr("x", w / 2)
             .text("Frequently Reported Causes for Motor Vehicle Incidents (2012-2018)")
-
-    }
-
-    makeFactorsHistogram()
-
-
-    var handleMouseOver = (element, d) => {
-        // Use mouse coordinates for tooltip position
-        var xPos = d3.event.pageX
-        var yPos = d3.event.pageY
-
-        //Update the tooltip position
-        tooltip.style("left", xPos + "px").style("top", yPos + "px")
-
-        let zipCode = d.properties.postalCode
-        let borough = d.properties.borough
-        let datapoint = NESTED_CHORO_DATA.find(x => x.key == d.properties.postalCode)
-        let incidentCount = datapoint ? datapoint.value.zipIncidents : "No data"
-
-        // Update the tooltip information
-        d3.select("#zipCode").text(zipCode)
-        d3.select("#incidentCount").text(incidentCount)
-        d3.select("#borough").text(borough)
-
-        // Show the tooltip
-        tooltip.classed("hidden", false)
-
-        // Highlight the current element
-        d3.select(element).style("stroke-width", "4")
-    }
-
-    var handleMouseOut = element => {
-        //Hide the tooltip again
-        tooltip.classed("hidden", true)
-
-        // Remove highlight from the element
-        d3.select(element).style("stroke-width", "1")
     }
 
     let plotIncidentHistogram = histogramData => {
@@ -182,7 +173,7 @@
         let yAxis = d3.axisLeft(yScale).ticks(5)
 
         // Bars
-        svgIncidents.selectAll(".incident")
+        histogramIncidents.selectAll(".incident")
             .data(histogramData)
             .enter()
             .append("rect").attr("class", "incident")
@@ -193,18 +184,18 @@
             .attr("fill", colors.three)
 
         // Make x axis with a g-element
-        svgIncidents.append("g")
+        histogramIncidents.append("g")
             .attr("transform", "translate(0, " + (boundaries.bottom) + ")")
             .call(xAxis)
 
         // Make y axis with another g-element
-        svgIncidents.append("g")
+        histogramIncidents.append("g")
             .attr("id", "yAxis")
             .attr("transform", "translate(" + boundaries.left + ", 0)")
             .call(yAxis)
 
         // Text label for the Y axis
-        svgIncidents.append("text")
+        histogramIncidents.append("text")
             .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
             .attr("y", boundaries.left / 2 - 20)
@@ -212,14 +203,14 @@
             .text("Incidents")
 
         // Text label for the X axis
-        svgIncidents.append("text")
+        histogramIncidents.append("text")
             // .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
             .attr("y", boundaries.bottom + 40)
             .attr("x", w / 2)
             .text("Hour of the Day")
 
-        svgIncidents.append("text")
+        histogramIncidents.append("text")
             // .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
             .attr("y", boundaries.top - 20)
@@ -227,31 +218,7 @@
             .text("Number of Reported Incidents for the Period")
     }
 
-    let incidentRowConverter = row => ({
-        "hour": row.hour,
-        "ymDate": new Date(row.ym),
-        "count": +row.count
-    })
-
-
-    d3.csv("data/hist_incident_count.csv", incidentRowConverter, data => {
-        INCIDENTS_HIST_DATA = data
-
-        let nested = d3.nest()
-            .key(d => d.hour)
-            .sortKeys((a, b) => a - b)
-            .rollup(leaves => ({
-                "count": d3.sum(leaves, d => d.count)
-            }))
-            .entries(data)
-
-
-        console.log(nested)
-        plotIncidentHistogram(nested)
-    })
-
-
-    let drawAggregateHistogram = (histogramData) => {
+    let drawInjuredHistogram = (histogramData) => {
         let pMax = d3.max(histogramData, d => d.value.pedestrians)
         let cMax = d3.max(histogramData, d => d.value.cyclists)
         let mMax = d3.max(histogramData, d => d.value.motorists)
@@ -273,7 +240,7 @@
         let yAxis = d3.axisLeft(yScale).ticks(5)
 
         // Bars
-        svgAgg.selectAll(".motorist")
+        histogramInjured.selectAll(".motorist")
             .data(histogramData)
             .enter()
             .append("rect").attr("class", "motorist")
@@ -283,7 +250,7 @@
             .attr("height", d => boundaries.bottom - yScale(d.value.motorists))
             .attr("fill", colors.three)
 
-        svgAgg.selectAll(".pedestrian")
+        histogramInjured.selectAll(".pedestrian")
             .data(histogramData)
             .enter()
             .append("rect").attr("class", "pedestrian")
@@ -293,7 +260,7 @@
             .attr("height", d => boundaries.bottom - yScale(d.value.pedestrians))
             .attr("fill", colors.two)
 
-        svgAgg.selectAll(".cyclist")
+        histogramInjured.selectAll(".cyclist")
             .data(histogramData)
             .enter()
             .append("rect").attr("class", "cyclist")
@@ -304,18 +271,18 @@
             .attr("fill", colors.one)
 
         // Make x axis with a g-element
-        svgAgg.append("g")
+        histogramInjured.append("g")
             .attr("transform", "translate(0, " + (boundaries.bottom) + ")")
             .call(xAxis)
 
         // Make y axis with another g-element
-        svgAgg.append("g")
+        histogramInjured.append("g")
             .attr("id", "yAxis")
             .attr("transform", "translate(" + boundaries.left + ", 0)")
             .call(yAxis)
 
         // Text label for the Y axis
-        svgAgg.append("text")
+        histogramInjured.append("text")
             .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
             .attr("y", boundaries.left / 2 - 20)
@@ -323,7 +290,7 @@
             .text("Injured or Killed")
 
         // Text label for the X axis
-        svgAgg.append("text")
+        histogramInjured.append("text")
             // .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
             .attr("y", boundaries.bottom + 40)
@@ -348,7 +315,7 @@
             },
         ]
 
-        var legend = svgAgg.append("g")
+        let legend = histogramInjured.append("g")
             .attr("transform", (d, i) => ("translate(0," + 0.2 * h + ")"))
             .attr("font-family", "sans-serif")
             .attr("font-size", 14)
@@ -374,19 +341,19 @@
                 } else if (d.title == "Motorists") {
                     selector = ".motorist"
                 }
-                svgAgg.selectAll(selector)
+                histogramInjured.selectAll(selector)
                     .attr("fill", "orange")
 
             })
             .on("mouseout", function (d) {
                 if (d.title == "Pedestrians") {
-                    svgAgg.selectAll(".pedestrian")
+                    histogramInjured.selectAll(".pedestrian")
                         .attr("fill", colors.two)
                 } else if (d.title == "Motorists") {
-                    svgAgg.selectAll(".motorist")
+                    histogramInjured.selectAll(".motorist")
                         .attr("fill", colors.three)
                 } else if (d.title == "Cyclists") {
-                    svgAgg.selectAll(".cyclist")
+                    histogramInjured.selectAll(".cyclist")
                         .attr("fill", colors.one)
                 }
 
@@ -400,7 +367,7 @@
             .text(d => d.title)
 
         // Text label for the X axis
-        svgAgg.append("text")
+        histogramInjured.append("text")
             // .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
             .attr("y", boundaries.top - 20)
@@ -408,7 +375,7 @@
             .text("Reported Injured/Killed People as Result of an Incident")
     }
 
-    let parseHistogramRow = row => ({
+    let parseInjuredRow = row => ({
         "hour": row.hour,
         "ymDate": new Date(20 + row.ym.slice(0, 2), +row.ym.slice(3, 5) - 1),
         "total_injured": +row.total_injured,
@@ -421,7 +388,33 @@
         "motorists_killed": +row.motorists_killed
     })
 
-    d3.csv("data/histogram_data.csv", parseHistogramRow, data => {
+    let parseIncidentRow = row => ({
+        "hour": row.hour,
+        "ymDate": new Date(row.ym),
+        "count": +row.count
+    })
+
+    // _____ READ DATA FILES ________
+
+    d3.json("data/data_factors.json", factorsData => {
+        makeFactorsHistogram(factorsData)
+    })
+
+    d3.csv("data/data_incident_histogram.csv", parseIncidentRow, data => {
+        INCIDENTS_HIST_DATA = data
+
+        let nested = d3.nest()
+            .key(d => d.hour)
+            .sortKeys((a, b) => a - b)
+            .rollup(leaves => ({
+                "count": d3.sum(leaves, d => d.count)
+            }))
+            .entries(data)
+
+        plotIncidentHistogram(nested)
+    })
+
+    d3.csv("data/data_injured_histogram.csv", parseInjuredRow, data => {
         LAYERED_HIST_DATA = data
 
         let nested = d3.nest()
@@ -434,37 +427,11 @@
             }))
             .entries(data)
 
-        drawAggregateHistogram(nested)
+        drawInjuredHistogram(nested)
     })
 
 
-
-
     // _____________CHOROPLETH________________
-    let choroWidth = 600
-    let choroHeight = 600
-
-    //GENERAL VARIABLE INITIALIZATION
-    let timelineWidth = 1000
-    let timelineHeight = 150
-    let timelineBoundaries = {
-        bottom: timelineHeight - 60,
-        top: 20,
-        left: 60,
-        right: timelineWidth - 20
-    }
-
-    //Create SVG elements
-    var svgTimeline = d3.select("#containerTimeline")
-        .append("svg")
-        .attr("width", timelineWidth)
-        .attr("height", timelineHeight)
-
-    var svgGeo = d3.select("#containerGeo")
-        .append("svg")
-        .attr("width", choroWidth)
-        .attr("height", choroHeight)
-
 
     //Load in GeoJSON data
     d3.json("data/zipcodes.geojson", (error, json) => {
@@ -499,7 +466,7 @@
             incidentCount: +d.incident_count // Total number of registered collisions for ym
         })
 
-        d3.csv("data/cleanedCollisionDataGrouped.csv", rowConverterCollisions, collisionData => {
+        d3.csv("data/data_timeline.csv", rowConverterCollisions, collisionData => {
 
             // Nest collisionData on ym summing up number of incidents - needed for timeline
             let nestData = d3.nest()
@@ -523,13 +490,13 @@
             // Timeline x-scale
             let xMinTimeline = d3.min(collisionData, d => d.ymDate) //Perhaps compute in advance?
             let xMaxTimeline = d3.max(collisionData, d => d.ymDate) //Perhaps compute in advance?
-            
+
             setPeriod(xMinTimeline, xMaxTimeline)
 
             let xScaleTimeline = d3.scaleTime()
                 .domain([xMinTimeline, xMaxTimeline])
                 .range([timelineBoundaries.left, timelineBoundaries.right])
-            
+
             // Timeline y-scale
             let yMinTimeline = 0
             let yMaxTimeline = d3.max(nestData, d => d.value.ymIncidents)
@@ -578,10 +545,10 @@
                 .append("path")
                 .attr("d", path)
                 .on("mouseover", function (d) {
-                    handleMouseOver(this, d)
+                    mouseOverChoro(this, d)
                 })
                 .on("mouseout", function () {
-                    handleMouseOut(this)
+                    mouseOutChoro(this)
                 })
 
 
@@ -658,7 +625,7 @@
                 let yAxis = d3.axisLeft(yScale).ticks(5)
 
                 // Bars
-                svgAgg.selectAll(".motorist")
+                histogramInjured.selectAll(".motorist")
                     .data(histogramData)
                     .transition()
                     .attr("x", d => xScale(d.key))
@@ -666,7 +633,7 @@
                     .attr("width", xScale.bandwidth())
                     .attr("height", d => boundaries.bottom - yScale(d.value.motorists))
 
-                svgAgg.selectAll(".pedestrian")
+                histogramInjured.selectAll(".pedestrian")
                     .data(histogramData)
                     .transition()
                     .attr("x", d => xScale(d.key) + xScale.bandwidth() / 4)
@@ -674,7 +641,7 @@
                     .attr("width", xScale.bandwidth() / 2)
                     .attr("height", d => boundaries.bottom - yScale(d.value.pedestrians))
 
-                svgAgg.selectAll(".cyclist")
+                histogramInjured.selectAll(".cyclist")
                     .data(histogramData)
                     .transition()
                     .attr("x", d => xScale(d.key) + (xScale.bandwidth() / 2.6))
@@ -683,7 +650,7 @@
                     .attr("height", d => boundaries.bottom - yScale(d.value.cyclists))
 
                 // Make y axis with another g-element
-                svgAgg.select("#yAxis")
+                histogramInjured.select("#yAxis")
                     .transition()
                     .call(yAxis)
             }
@@ -734,7 +701,7 @@
                 let yAxis = d3.axisLeft(yScale).ticks(5)
 
                 // Bars
-                svgIncidents.selectAll(".incident")
+                histogramIncidents.selectAll(".incident")
                     .data(histogramData)
                     .transition()
                     .attr("x", d => xScale(d.key))
@@ -743,7 +710,7 @@
                     .attr("height", d => boundaries.bottom - yScale(d.value.count))
 
                 // Make y axis with another g-element
-                svgIncidents.select("#yAxis")
+                histogramIncidents.select("#yAxis")
                     .transition()
                     .call(yAxis)
             }

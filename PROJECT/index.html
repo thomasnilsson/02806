@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="utf-8">
 	<title>NYC Motor Vehicle Collisions</title>
+	<link rel="shortcut icon" href=""> <!-- Prevents stupid favicon error in JS Console -->
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/custom.css">
@@ -16,28 +18,45 @@
 
 	</article>
 	<div align="center">
+		<h3>Selected Period:
+			<i><span id="period" /></i>
+		</h3>
+		<h5>(Brush the timeline to select a period)</h5>
+
 		<div id="containerTimeline"></div>
-		<h3>Selected Period: <span id="period"/></h3>
 
 		<div id="containerGeo" style="display:inline-block;">
 			<div class="tooltip" id="tooltipChoropleth" class="hidden">
-				<strong><p>Incidents: <span id="incidentCount"/></strong></p>
-					<p>Zip Code: <span id="zipCode"/></p>
-					<p>Borough: <span id="borough"/></p>
+				<strong>
+					<p>Incidents:
+						<span id="incidentCount" />
+				</strong>
+				</p>
+				<p>Zip Code:
+					<span id="zipCode" />
+				</p>
+				<p>Borough:
+					<span id="borough" />
+				</p>
 			</div>
 		</div>
-	<div style="display:inline-block;">
-		<div id="containerHistogram"></div>
-		<div class="tooltip" id="tooltipInjured" class="hidden">
-			<strong><p>Injured/Killed: <span id="injuredCount"/></strong></p>
-				<p>Type: <span id="type"/></p>
-				<p>Borough: <span id="borough"/></p>
+		<div style="display:inline-block;">
+			<div id="containerHistogram"></div>
+			<div class="tooltip" id="tooltipInjured" class="hidden">
+				<strong>
+					<p>Injured/Killed:
+						<span id="injuredCount" />
+				</strong>
+				</p>
+				<p>Type:
+					<span id="type" />
+				</p>
+			</div>
+			<div id="incidentCountBox"></div>
 		</div>
-		<div id="incidentCountBox"></div>
+		<div id="factorsBox"></div>
 	</div>
-	<div id="factorsBox"></div>
 	</div>
-		</div>
 	</div>
 
 	<article class="markdown-body">
