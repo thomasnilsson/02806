@@ -56,7 +56,7 @@
                 "value": 18424
             },
             {
-                "key": "Driving Under Influence",
+                "key": "Under Influence",
                 "value": 9092
             }
         ]
@@ -104,7 +104,7 @@
         svgFactors.append("text")
             .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
-            .attr("y", boundaries.left / 2 - 10)
+            .attr("y", boundaries.left / 2 - 15)
             .attr("x", -h / 2)
             .text("Incidents (2012-2018)")
 
