@@ -119,62 +119,8 @@
             .style("text-anchor", "middle")
             .attr("y", boundaries.top - 20)
             .attr("x", w / 2)
-            .text("Reported Causes for Motor Vehicle Incidents (2012-2018)")
+            .text("Frequently Reported Causes for Motor Vehicle Incidents (2012-2018)")
 
-
-        // var factorBoundaries = {
-        //     bottom: h - 60,
-        //     top: 20,
-        //     left: 100,
-        //     right: w - 150
-        // }
-
-        // var svgFactors = d3.select("body").select("#factorsBox")
-        //     .append("svg")
-        //     .attr("width", w)
-        //     .attr("height", h)
-        //     .append("g")
-        //     .attr("transform", "translate(" + factorBoundaries.left + "," + factorBoundaries.top + ")")
-
-        // var x = d3.scaleLinear()
-        //     .range([factorBoundaries.left, factorBoundaries.right])
-        //     .domain([0, d3.max(factorsData, d => d.value)])
-
-        // var y = d3.scaleBand()
-        //     .range([factorBoundaries.bottom, factorBoundaries.top], .1)
-        //     .domain(factorsData.map(d => d.key))
-        //     .paddingInner(innerPadding)
-
-        // //make y axis to show bar names
-        // var yAxis = d3.axisLeft()
-        //     .scale(y)
-        //     .tickSize(0)
-
-        // var gy = svgFactors.append("g")
-        //     .attr("class", "y axis")
-        //     .call(yAxis)
-        //     .style("font-size", "14px")      
-
-        // var bars = svgFactors.selectAll(".bar")
-        //     .data(factorsData)
-        //     .enter()
-        //     .append("g")      
-
-        // //append rects
-        // bars.append("rect")
-        //     .attr("class", "bar")
-        //     .attr("y", d => y(d.key))
-        //     .attr("height", y.bandwidth())
-        //     .attr("x", x(0))
-        //     .attr("width", d => x(d.value))
-        //     .attr("fill", colors.two)
-
-        // //add a value label to the right of each bar
-        // bars.append("text")
-        //     .attr("class", "label")
-        //     .attr("y", d => y(d.key) + y.bandwidth() / 2 + 4)
-        //     .attr("x", d => x(d.value)+ 3)
-        //     .text(d => d.value)
     }
 
     makeFactorsHistogram()
