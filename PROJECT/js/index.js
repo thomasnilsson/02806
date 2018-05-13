@@ -15,6 +15,7 @@
     }
     var innerPadding = 0.1
 
+
     let LAYERED_HIST_DATA, INCIDENTS_HIST_DATA, CHORO_COLOR_SCALE, NESTED_CHORO_DATA;
     let tooltip = d3.select("#tooltipChoropleth").classed("hidden", true)
 
@@ -27,6 +28,96 @@
         .append("svg")
         .attr("width", w)
         .attr("height", h)
+
+    var svgFactors = d3.select("body").select("#factorsBox")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h)
+
+    let makeFactorsHistogram = () => {
+        let factorsData = [{
+                "key": "ailments",
+                "value": 85409
+            },
+            {
+                "key": "bad_driving",
+                "value": 192014
+            },
+            {
+                "key": "car_defects",
+                "value": 56605
+            },
+            {
+                "key": "distraction",
+                "value": 176373
+            },
+            {
+                "key": "outside_influence",
+                "value": 18424
+            },
+            {
+                "key": "under_influence",
+                "value": 9092
+            }
+        ]
+
+        let yMax = d3.max(factorsData, d => d.value)
+        console.log("y max: " + yMax)
+        // x Scale
+        let xScale = d3.scaleBand()
+            .domain(factorsData.map(d => d.key))
+            .rangeRound([boundaries.left, boundaries.right])
+            .paddingInner(innerPadding)
+
+        let xAxis = d3.axisBottom(xScale)
+
+        // y Scale
+        let yScale = d3.scaleLinear()
+            .domain([0, yMax])
+            .range([boundaries.bottom, boundaries.top])
+
+        let yAxis = d3.axisLeft(yScale).ticks(5)
+
+        // Bars
+        svgFactors.selectAll(".factor")
+            .data(factorsData)
+            .enter()
+            .append("rect").attr("class", "factor")
+            .attr("x", d => xScale(d.key))
+            .attr("y", d => yScale(d.value))
+            .attr("width", xScale.bandwidth())
+            .attr("height", d => boundaries.bottom - yScale(d.value))
+            .attr("fill", colors.two)
+
+        // Make x axis with a g-element
+        svgFactors.append("g")
+            .attr("transform", "translate(0, " + (boundaries.bottom) + ")")
+            .call(xAxis)
+
+        // Make y axis with another g-element
+        svgFactors.append("g")
+            .attr("id", "yAxis")
+            .attr("transform", "translate(" + boundaries.left + ", 0)")
+            .call(yAxis)
+
+        // Text label for the Y axis
+        svgFactors.append("text")
+            .attr("transform", "rotate(-90)")
+            .style("text-anchor", "middle")
+            .attr("y", boundaries.left / 2 - 10)
+            .attr("x", -h / 2)
+            .text("#Incidents")
+
+        // Text label for the X axis
+        svgFactors.append("text")
+            // .attr("transform", "rotate(-90)")
+            .style("text-anchor", "middle")
+            .attr("y", boundaries.bottom + 40)
+            .attr("x", w / 2)
+            .text("Hour of the Day")
+    }
+
+    makeFactorsHistogram()
 
 
     var handleMouseOver = (element, d) => {
@@ -41,15 +132,14 @@
 
 
         let zipCode = d.properties.postalCode
-        let poName = d.properties.PO_NAME
+        let borough = d.properties.borough
         let datapoint = NESTED_CHORO_DATA.find(x => x.key == d.properties.postalCode)
         let incidentCount = datapoint ? datapoint.value.zipIncidents : "No data"
 
         // Update the tooltip information
         d3.select("#zipCode").text(zipCode)
         d3.select("#incidentCount").text(incidentCount)
-        d3.select("#postalName").text(poName)
-        // d3.select("#time").text(parseInt(d.Time) + " minutes")
+        d3.select("#borough").text(borough)
 
         // Show the tooltip
         tooltip.classed("hidden", false)
@@ -400,6 +490,7 @@
                     handleMouseOut(this)
                 })
 
+
             let initChoropleth = () => {
                 // Color scale for coloring zip codes
                 CHORO_COLOR_SCALE = d3.scaleLinear()
@@ -412,6 +503,7 @@
                         return datapoint ? CHORO_COLOR_SCALE(datapoint.value.zipIncidents) : "white"
                     })
                     .style("stroke", "black")
+
             }
 
             initChoropleth()

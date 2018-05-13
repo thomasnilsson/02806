@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 	<meta charset="utf-8">
 	<title>NYC Motor Vehicle Collisions</title>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
-	<link rel="stylesheet" href="css/foundation.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/custom.css">
 	<link rel="stylesheet" href="css/md/github-markdown.css">
 </head>
@@ -22,12 +21,13 @@
 		<div class="tooltip" id="tooltipChoropleth" class="hidden">
 			<strong><p>Incidents: <span id="incidentCount"/></strong></p>
 				<p>Zip Code: <span id="zipCode"/></p>
-				<p>Post Name: <span id="postalName"/></p>
+				<p>Borough: <span id="borough"/></p>
 		</div>
 	</div>
 	<div style="display:inline-block;">
 		<div id="containerHistogram"></div>
 		<div id="incidentCountBox"></div>
+		<div id="factorsBox"></div>
 	</div>
 	</div>
 
