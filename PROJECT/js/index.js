@@ -94,8 +94,6 @@
             .attr("transform", "translate(0, " + (boundaries.bottom) + ")")
             .call(xAxis)
             .selectAll("text")
-            .attr("transform", "rotate(-45)")
-            .style("text-anchor", "end")
 
         // Make y axis with another g-element
         svgFactors.append("g")
@@ -133,9 +131,6 @@
 
         //Update the tooltip position
         tooltip.style("left", xPos + "px").style("top", yPos + "px")
-
-        console.log(d)
-
 
         let zipCode = d.properties.postalCode
         let borough = d.properties.borough
@@ -206,9 +201,9 @@
         svgIncidents.append("text")
             .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
-            .attr("y", boundaries.left / 2 - 10)
-            .attr("x", -h / 2)
-            .text("#Incidents")
+            .attr("y", boundaries.left / 2 - 20)
+            .attr("x", -boundaries.bottom / 1.7)
+            .text("Incidents")
 
         // Text label for the X axis
         svgIncidents.append("text")
@@ -317,8 +312,8 @@
         svgAgg.append("text")
             .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
-            .attr("y", boundaries.left / 2 - 10)
-            .attr("x", -h / 2)
+            .attr("y", boundaries.left / 2 - 20)
+            .attr("x", -h / 2.5)
             .text("Injured or Killed")
 
         // Text label for the X axis
