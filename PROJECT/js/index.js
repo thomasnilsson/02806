@@ -8,8 +8,8 @@
     var w = 700
     var h = 300
     var boundaries = {
-        bottom: h - 60,
-        top: 20,
+        bottom: h - 90,
+        top: 40,
         left: 60,
         right: w - 150
     }
@@ -93,6 +93,9 @@
         svgFactors.append("g")
             .attr("transform", "translate(0, " + (boundaries.bottom) + ")")
             .call(xAxis)
+            .selectAll("text")
+            .attr("transform", "rotate(-45)")
+            .style("text-anchor", "end")
 
         // Make y axis with another g-element
         svgFactors.append("g")
@@ -100,11 +103,13 @@
             .attr("transform", "translate(" + boundaries.left + ", 0)")
             .call(yAxis)
 
+
+
         // Text label for the Y axis
         svgFactors.append("text")
             .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
-            .attr("y", boundaries.left / 2 - 10)
+            .attr("y", boundaries.left / 2 - 20)
             .attr("x", -h / 2)
             .text("Incidents (2012-2018)")
 
@@ -112,9 +117,64 @@
         svgFactors.append("text")
             // .attr("transform", "rotate(-90)")
             .style("text-anchor", "middle")
-            .attr("y", boundaries.bottom + 40)
+            .attr("y", boundaries.top - 20)
             .attr("x", w / 2)
-            .text("Cause")
+            .text("Reported Causes for Motor Vehicle Incidents (2012-2018)")
+
+
+        // var factorBoundaries = {
+        //     bottom: h - 60,
+        //     top: 20,
+        //     left: 100,
+        //     right: w - 150
+        // }
+
+        // var svgFactors = d3.select("body").select("#factorsBox")
+        //     .append("svg")
+        //     .attr("width", w)
+        //     .attr("height", h)
+        //     .append("g")
+        //     .attr("transform", "translate(" + factorBoundaries.left + "," + factorBoundaries.top + ")")
+
+        // var x = d3.scaleLinear()
+        //     .range([factorBoundaries.left, factorBoundaries.right])
+        //     .domain([0, d3.max(factorsData, d => d.value)])
+
+        // var y = d3.scaleBand()
+        //     .range([factorBoundaries.bottom, factorBoundaries.top], .1)
+        //     .domain(factorsData.map(d => d.key))
+        //     .paddingInner(innerPadding)
+
+        // //make y axis to show bar names
+        // var yAxis = d3.axisLeft()
+        //     .scale(y)
+        //     .tickSize(0)
+
+        // var gy = svgFactors.append("g")
+        //     .attr("class", "y axis")
+        //     .call(yAxis)
+        //     .style("font-size", "14px")      
+
+        // var bars = svgFactors.selectAll(".bar")
+        //     .data(factorsData)
+        //     .enter()
+        //     .append("g")      
+
+        // //append rects
+        // bars.append("rect")
+        //     .attr("class", "bar")
+        //     .attr("y", d => y(d.key))
+        //     .attr("height", y.bandwidth())
+        //     .attr("x", x(0))
+        //     .attr("width", d => x(d.value))
+        //     .attr("fill", colors.two)
+
+        // //add a value label to the right of each bar
+        // bars.append("text")
+        //     .attr("class", "label")
+        //     .attr("y", d => y(d.key) + y.bandwidth() / 2 + 4)
+        //     .attr("x", d => x(d.value)+ 3)
+        //     .text(d => d.value)
     }
 
     makeFactorsHistogram()
@@ -211,6 +271,13 @@
             .attr("y", boundaries.bottom + 40)
             .attr("x", w / 2)
             .text("Hour of the Day")
+
+        svgIncidents.append("text")
+            // .attr("transform", "rotate(-90)")
+            .style("text-anchor", "middle")
+            .attr("y", boundaries.top - 20)
+            .attr("x", w / 2)
+            .text("Number of Reported Incidents for the Period")
     }
 
     let incidentRowConverter = row => ({
@@ -357,6 +424,14 @@
             .attr("y", rectSize / 2)
             .attr("dy", "0.32em")
             .text(d => d.title)
+
+        // Text label for the X axis
+        svgAgg.append("text")
+            // .attr("transform", "rotate(-90)")
+            .style("text-anchor", "middle")
+            .attr("y", boundaries.top - 20)
+            .attr("x", w / 2)
+            .text("Reported Injured/Killed People as Result of an Incident")
     }
 
     let parseHistogramRow = row => ({
