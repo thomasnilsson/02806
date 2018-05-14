@@ -4,7 +4,8 @@
 <head>
 	<meta charset="utf-8">
 	<title>NYC Motor Vehicle Collisions</title>
-	<link rel="shortcut icon" href="">
+	<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="img/favicon.ico" type="image/x-icon">
 	<!-- Prevents stupid favicon error in JS Console -->
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -47,7 +48,9 @@
 			dangerous spots? The choropleth below presents accident distribution over zip codes, allowing us look at a specific period
 			of time. At first glance we can see, that the main points are: East New York (Brooklyn), Dumbo (Brooklyn), Long Island
 			City (Brooklyn) or Midtown (Manhattan). What can be the cause? Those are areas where the population is very high or very
-			poor neighbourhoods with poor infrastructure <a href="https://www.forbes.com/sites/scottwinship/2014/06/05/new-york-citys-poor-neighborhoods-tale-of-two-cities/#41ca8ab1281a"> [1]</a>.
+			poor neighbourhoods with poor infrastructure
+			<a href="https://www.forbes.com/sites/scottwinship/2014/06/05/new-york-citys-poor-neighborhoods-tale-of-two-cities/#41ca8ab1281a">
+			[1]</a>.
 
 		</p>
 		<p>
@@ -66,17 +69,17 @@
 
 		</p>
 		<p>
-			The histogram below describes the distribution of accidents by contributing factors. It turns out, that the majority
-			of causes are not drunk drivers, but tired, overworked people getting back from work. They are getting distracted very
-			easily , which increases the risk of being involved in a collision.
+			The histogram below describes the distribution of accidents by contributing factors. It turns out, that the majority of causes
+			are not drunk drivers, but tired, overworked people getting back from work. They are getting distracted very easily ,
+			which increases the risk of being involved in a collision.
 
 		</p>
-				<!-- HISTOGRAM: CONTRIBUTING FACTORS -->
+		<!-- HISTOGRAM: CONTRIBUTING FACTORS -->
 
-				<div id="factorsBox" align="center"></div>
-				<p align="center">
-					<a href="https://raw.githubusercontent.com/thomasnilsson/02806/master/PROJECT/data/data_factors.json?token=AJB0pwrPtfo_GIBkZrx3BOd8uU4QBqAZks5bAe6CwA%3D%3D">Download Causes Dataset</a>
-				</p>
+		<div id="factorsBox" align="center"></div>
+		<p align="center">
+			<a href="https://raw.githubusercontent.com/thomasnilsson/02806/master/PROJECT/data/data_factors.json?token=AJB0pwrPtfo_GIBkZrx3BOd8uU4QBqAZks5bAe6CwA%3D%3D">Download Causes Dataset</a>
+		</p>
 		<p>
 			Finally, we found that generally the larger the population of a borough, the more accidents were likely to occur [1]. Although,
 			the traffic in NYC grows slightly each year, the trend of accidents over the past few years does not seem to decrease

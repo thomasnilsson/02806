@@ -15,7 +15,7 @@
     }
     let innerPadding = 0.1
 
-    let choroWidth = 600
+    let choroWidth = 800
     let choroHeight = 600
 
     //GENERAL VARIABLE INITIALIZATION
@@ -80,7 +80,7 @@
         tooltipInjured.style("left", xPos + "px").style("top", yPos + "px").classed("hidden", false)
 
         // Update the tooltipChoropleth information
-        let timeInterval = d.key + "-" + (+d.key+1)
+        let timeInterval = d.key + "-" + (+d.key + 1)
         d3.select("#hourOfDayInjured").text(timeInterval)
         d3.select("#motorists").text(d.value.motorists)
         d3.select("#pedestrians").text(d.value.pedestrians)
@@ -93,13 +93,11 @@
         tooltipInjured.classed("hidden", true)
         let type = d3.select(element).attr("class")
         let color;
-        if (type == "motorist"){
+        if (type == "motorist") {
             color = colors.three
-        }
-        else if (type == "pedestrian"){
+        } else if (type == "pedestrian") {
             color = colors.two
-        }
-        else if (type == "cyclist"){
+        } else if (type == "cyclist") {
             color = colors.one
         }
         d3.select(element).attr("fill", color)
@@ -111,9 +109,9 @@
 
         //Update the tooltipChoropleth position
         tooltipIncident.style("left", xPos + "px").style("top", yPos + "px").classed("hidden", false)
-        
+
         // Update the tooltipChoropleth information
-        let timeInterval = d.key + "-" + (+d.key+1)
+        let timeInterval = d.key + "-" + (+d.key + 1)
         d3.select("#hourOfDayIncident").text(timeInterval)
         d3.select("#incidents").text(d.value.count)
 
@@ -629,7 +627,6 @@
                     mouseOutChoro(this)
                 })
 
-
             let initChoropleth = () => {
                 // Color scale for coloring zip codes
                 CHORO_COLOR_SCALE = d3.scaleLinear()
@@ -642,6 +639,44 @@
                         return datapoint ? CHORO_COLOR_SCALE(datapoint.value.zipIncidents) : "white"
                     })
                     .style("stroke", "black")
+
+                let quantiles = [
+                    0,
+                    0.2 * yMaxTimeline,
+                    0.4 * yMaxTimeline,
+                    0.6 * yMaxTimeline,
+                    0.8 * yMaxTimeline,
+                    yMaxTimeline,
+                ]
+
+                let rectSize = 20
+
+                let legend = svgGeo.append("g").attr("id", "choroLegend")
+                    .attr("transform", (d, i) => ("translate(0," + 0.2 * h + ")"))
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", 14)
+                    .attr("text-anchor", "end")
+                    .selectAll("g")
+                    .data(quantiles)
+                    .enter()
+                    .append("g")
+                    .attr("transform", (d, i) => ("translate(" + 0 + "," + i * 1.05 * rectSize + ")"))
+
+                legend.append("rect").attr("class", "choroLegendRect")
+                    .attr("x", choroWidth - 175)
+                    .attr("width", rectSize)
+                    .attr("height", rectSize)
+                    .attr("fill", d => CHORO_COLOR_SCALE(d))
+                    .attr("stroke", "black")
+                    .attr("stroke-width", "0.2")
+
+                legend.append("text").attr("class", "choroLegendText")
+                    .attr("x", choroWidth - 150)
+                    .style("text-anchor", "start")
+                    .attr("y", rectSize / 2)
+                    .attr("dy", "0.32em")
+                    .text(d => parseInt(d)  + " incidents")
+                // console.log(quantiles)
 
             }
 
@@ -671,7 +706,50 @@
                 // Dynamic color scale
                 let choroMax = d3.max(NESTED_CHORO_DATA, d => d.value.zipIncidents)
 
+                let quantiles = [
+                    0,
+                    0.2 * choroMax,
+                    0.4 * choroMax,
+                    0.6 * choroMax,
+                    0.8 * choroMax,
+                    choroMax,
+                ]
+
+                let legend = svgGeo.select("#choroLegend").selectAll("g")
+
+                legend.data(quantiles)
+
+                // console.log(legend)
+                legend.select(".choroLegendText").data() // It doesnt work without this line of code for some reason
+
+                legend.selectAll(".choroLegendText").text(d => parseInt(d) + " incidents")
+
+                // console.log(legend.select(".choroLegendText").data())
+                // legend.selectAll("g")
+                //     .enter()
+                //     .selectAll(".choroLegendText")
+                //     .text(d => parseInt(d))
+
+                console.log()
+
+                // legend.append("rect").attr("class", "choroLegendRect")
+                //     .attr("x", choroWidth - 175)
+                //     .attr("width", rectSize)
+                //     .attr("height", rectSize)
+                //     .attr("fill", d => CHORO_COLOR_SCALE(d))
+                //     .attr("stroke", "black")
+                //     .attr("stroke-width", "0.2")
+
+                // legend.append("text").attr("class", "choroLegendText")
+                //     .attr("x", choroWidth - 140)
+                //     .style("text-anchor", "start")
+                //     .attr("y", rectSize / 2)
+                //     .attr("dy", "0.32em")
+                //     .text(d => parseInt(d))
+
+
                 CHORO_COLOR_SCALE.domain([0, choroMax])
+
 
                 // Update choropleth colors
                 paths.style("fill", (d, i) => {
@@ -679,6 +757,7 @@
                         return datapoint ? CHORO_COLOR_SCALE(datapoint.value.zipIncidents) : "white"
                     })
                     .style("stroke", "black")
+                
             }
 
             let redrawLayeredHistogram = (histogramData) => {
