@@ -22,7 +22,10 @@
 		<p>
 			The dataset used is NYPD's Motor Vehicle Collisions, which is provided by the NYC Open Data repository. This dataset was
 			created for the Vision Zero initiative, which is a multi-national road traffic safety project that aims at decreasing
-			the number of fatalities or serious injuries involving road traffic. The dataset consist of information about all collisions
+			the number of fatalities or serious injuries involving road traffic.
+		</p>
+		<p>
+			The dataset consist of information about all collisions
 			in NYC from July 2012 to April 2018. It contains information about date, location, cause of the accident, number and type
 			of injured, and killed road users. The dataset consists of 1.25M rows, 29 columns, resulting in a file size of 275MB.
 		</p>
@@ -32,11 +35,13 @@
 			Each of the group members is an active driver, cyclist and pedestrian.
 			The problem of traffic accidents is close to our hearts. We have decided to explore the collision data to see if there
 			were any underlying trends and relationships that could explain the number of accidents occurring. As a consequence, it
-			might help responsible institutions to find out what could be done to make cities safer. Moreover, The NYPD's Motor Vehicle
+			might help responsible institutions to find out what could be done to make cities safer.
+		</p>
+		<p>
+			Moreover, The NYPD's Motor Vehicle
 			Collisions dataset is large and covers a long range of time. Data contains wide range of information (time, location,
 			zipcode, type of victim, cause of accident etc). As a consequence, we have found this dataset very attractive and reliable.
-			We believe that the theses made on the basis of these data, can be considered as reasonable. What was your goal for the
-			end user’s experience?
+			We believe that the theses made on the basis of these data, can be considered as reasonable.
 		</p>
 		<h3><i>What was your goal for the end user’s experience?</i></h3>
 		<p>
@@ -63,10 +68,16 @@
 		<p>
 			We faced two main dataset challenges before creating the visualizations. First of all, many samples had missing data (for
 			instance lack of zip code). Secondly, the data set is huge. It was not possible to load about a million samples of data
-			using JavaScript. As a consequence, we have adapted the dataset strictly to our needs. Firstly, we have removed all samples,
+			using JavaScript.
+		</p>
+		<p>
+			As a consequence, we have adapted the dataset strictly to our needs. Firstly, we have removed all samples,
 			which did not have information about the zip code (we have decided to use choropleth, where area of NYC was divided by
 			zip code). It allowed us to reduce the dataset from 1,254,340 rows to 894,293. Secondly, we have decided to create two
-			separate datasets (Dataset A and Dataset B), which thanks to nesting, were significantly reduced. Dataset A was prepared
+			separate datasets (Dataset A and Dataset B), which thanks to nesting, were significantly reduced.
+
+		</p>
+		<p>Dataset A was prepared
 			mainly to show the distribution of collisions on the map of NYC. Originally, we were planning to plot the location of
 			the accidents However, it turned out to be impossible, due to the size of the dataset. Consequently, we have changed our
 			plans and agreed to use zip code choropleth map as a substitute. For this reason, we have grouped all rows by the zip
@@ -136,7 +147,7 @@
 
 		<h4>Category A: Visual Structuring</h4>
 		<p>
-			<b>Timeline</b> - the aim was to enable the user to analyze the changes occurring in the number of accidents or injured people
+			<b>Time bar</b> - the aim was to enable the user to analyze the changes occurring in the number of accidents or injured people
 			in the perspective of time.
 		</p>
 
@@ -243,7 +254,10 @@
 			of data, three different colors from the same palette of colors were used. What's more, by moving the mouse over the legend,
 			the appropriate data series is highlighted. Finally, a tooltip has been implemented here. Hovering over the individual
 			bar, allows the viewer to familiarize himself with the hourly period covered by the bar and the number of victims for
-			individual groups. The second histogram summarizes all types of collisions and presents distribution of accidents during
+			individual groups.
+		</p>
+		<p>
+			The second histogram summarizes all types of collisions and presents distribution of accidents during
 			the day. It has similar properties as the visualization presented before. Tooltip describes the period of time during
 			the day and the number of accidents.
 
@@ -279,11 +293,19 @@
 		<p>
 			It is always awkward to evaluate your own work before anybody else will do it. Nevertheless, we are especially pleased with
 			several aspects of our project. First of all, the data pre-processing ran quite smoothly. The acquired skills of using
-			python and pandas library allowed us to receive exactly what we needed to create a visualization in d3. We are satisfied
-			by the process of data exploration, which helped us to a deeper understanding of the data and come up with an interesting
-			story, which we find decent and reliable. From the technical point of view of D3 library usage, we consider integration
+			python and pandas library allowed us to receive exactly what we needed to create a visualization in d3.
+		</p>
+		<p>
+			We are satisfied by the process of data exploration, which helped us to a deeper understanding of the data and come up with an interesting
+			story, which we find decent and reliable.
+		</p>
+		<p>
+			From the technical point of view of D3 library usage, we consider integration
 			of choropleth map with time series and histograms, as a success. It was a challenge at the beginning, but we have handled
-			it. Finally, we have asked a few students, who are not part of this course, to play with our website and share their opinions.
+			it.
+		</p>
+		<p>
+			Finally, we have asked a few students, who are not part of this course, to play with our website and share their opinions.
 			They were very pleased with the intuitiveness, interactions and aesthetics of the website. They all got interested by
 			the story and were willing to explore data further. These tests confirmed our belief that we have done quite a decent
 			piece of work.
@@ -294,10 +316,15 @@
 			As we approached the end of our project, more and more ideas for a future work came to us. Having more time, we would try
 			to go into more details in the data exploration. Firstly, we would analyze collisions caused by different contributing
 			factors separately. Using that approach, we could validate the hypothesis that the most of collisions caused by drunk
-			drivers is happening in the late evening or during the night. Secondly, we would focus more on the comparison of individual
-			years according to collisions growth or drop. We could also use the choropleth map for this purpose, as we did now. Instead
+			drivers is happening in the late evening or during the night.
+		</p>
+		<p>
+			Secondly, we would focus more on the comparison of individual years according to collisions growth or drop. We could also use the choropleth map for this purpose, as we did now. Instead
 			of using the number of collisions as input, we could use the percentage of increase or decrease of the collisions in a
-			given area. That would allow us to find areas where the safety is growing. Thirdly, we came up with idea of finding relationship
+			given area. That would allow us to find areas where the safety is growing.
+		</p>
+		<p>
+			Thirdly, we came up with idea of finding relationship
 			between location and the type of accident. Maybe we would be able to answer question like: “Are the pedestrians more involved
 			in accidents in suburbs than downtown?”.
 		</p>
