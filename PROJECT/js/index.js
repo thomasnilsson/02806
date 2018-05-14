@@ -10,7 +10,7 @@
     let boundaries = {
         bottom: h - 90,
         top: 40,
-        left: 60,
+        left: 70,
         right: w - 150
     }
     let innerPadding = 0.1
